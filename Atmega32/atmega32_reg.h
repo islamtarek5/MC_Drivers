@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-25 12:55:48                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-25 13:09:40                              *
+ * @LastEditDate          : 2023-06-25 13:42:48                              *
  * @FilePath              : atmega32_reg.h                                   *
  ****************************************************************************/
 
@@ -53,5 +53,57 @@ typedef union
  */
 #define SREG       ((volatile SREG_t *) SREG_ADDRESS)    
 
+/**
+ * @brief Stack Pointer Registers and their bits . (R/W Registers)
+ * @note Stack Pointer Registers are divided into two 8-bit registers (SPL, SPH).
+ * @note Stack Pointer Registers initial Value is 0x00.
+ * @note Stack is implemented as growing from higher memory location to lower memory location.
+ * @note Stack Pointer will decrease by PUSH instruction and increase by POP instruction.
+ * @note Stack Pointer will change (increase or decrease) by one with data (Pop / Push) and by two with return address (Pop / Push).
+ * @note Stack Pointer must be set to point above $60.
+ */
+
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t SP0    : 1;    /* Stack Pointer Bit 0 */
+        uint8_t SP1    : 1;    /* Stack Pointer Bit 1 */
+        uint8_t SP2    : 1;    /* Stack Pointer Bit 2 */
+        uint8_t SP3    : 1;    /* Stack Pointer Bit 3 */
+        uint8_t SP4    : 1;    /* Stack Pointer Bit 4 */
+        uint8_t SP5    : 1;    /* Stack Pointer Bit 5 */
+        uint8_t SP6    : 1;    /* Stack Pointer Bit 6 */
+        uint8_t SP7    : 1;    /* Stack Pointer Bit 7 */
+    }bits;
+
+}SPL_t;
+
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t SP8         : 1;    /* Stack Pointer Bit 8   */
+        uint8_t SP9         : 1;    /* Stack Pointer Bit 9   */
+        uint8_t SP10        : 1;    /* Stack Pointer Bit 10  */
+        uint8_t SP11        : 1;    /* Stack Pointer Bit 11  */
+        uint8_t Reserved    : 4;    /* Reserved bits         */
+    }bits;
+
+}SPH_t;
+
+/**
+ * @brief Stack Pointer Registers Addresses.
+ */
+#define SPL_ADDRESS            0x5DU
+#define SPH_ADDRESS            0x5EU
+
+/**
+ * @brief Map Stack Pointer Registers and their bits to their Memory locations.
+ */
+#define SPL       ((volatile SPL_t *) SPL_ADDRESS)  
+#define SPH       ((volatile SPH_t *) SPH_ADDRESS)     
 
 #endif
