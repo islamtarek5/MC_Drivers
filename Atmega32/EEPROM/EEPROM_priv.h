@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:25:18                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 13:18:32                              *
+ * @LastEditDate          : 2023-06-27 15:33:06                              *
  * @FilePath              : EEPROM_priv.h                                    *
  ****************************************************************************/
 
@@ -56,5 +56,12 @@
 
 #define EEPROM_FIRST_LOCATION       0U
 #define EEPROM_LAST_LOCATION        1023U
+
+/**
+ * @brief EEPROM Writing
+ */
+
+#define EEPROM_NOT_WRITTEN          0U
+#define EEPROM_IS_WRITTEN           1U
 
 #endif
