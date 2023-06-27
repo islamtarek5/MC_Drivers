@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:25:18                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 15:33:06                              *
+ * @LastEditDate          : 2023-06-27 15:50:03                              *
  * @FilePath              : EEPROM_priv.h                                    *
  ****************************************************************************/
 
@@ -39,11 +39,12 @@
  */
 
 /**
- * @brief Address Shift
+ * @brief EEPROM Address 
  */
 
-#define ADDRESS_LEAST               0U    
-#define ADDRESS_MOST                8U
+#define EEPROM_ADDRESS_LEAST        0U    
+#define EEPROM_ADDRESS_MOST         8U
+#define EEPROM_NO_ADDRESS_SET       0U
 
 /**
  * @brief Write Condition
@@ -63,5 +64,11 @@
 
 #define EEPROM_NOT_WRITTEN          0U
 #define EEPROM_IS_WRITTEN           1U
+
+/**
+ * @brief Data length
+ */
+
+#define EEPROM_NO_DATA_WRITTEN      0U
 
 #endif
