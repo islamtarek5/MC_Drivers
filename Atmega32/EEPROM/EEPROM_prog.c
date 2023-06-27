@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:24:09                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 13:15:48                              *
+ * @LastEditDate          : 2023-06-27 15:25:13                              *
  * @FilePath              : EEPROM_prog.c                                    *
  ****************************************************************************/
 
@@ -124,11 +124,12 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
 #endif
 }
 
-void EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length)
+
+uint16_t EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length)
 {
 }
 
-void EEPROM_read_data(uint16_t base_address, uint8_t *data, uint16_t length)
+uint16_t EEPROM_read_data(uint16_t base_address, uint8_t *data, uint16_t length)
 {
 }
 
