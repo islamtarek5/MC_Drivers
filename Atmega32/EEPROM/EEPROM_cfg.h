@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:26:29                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 12:35:06                              *
+ * @LastEditDate          : 2023-06-27 13:15:58                              *
  * @FilePath              : EEPROM_cfg.h                                     *
  ****************************************************************************/
 
@@ -24,11 +24,10 @@
 /**
  * @brief OS Configuration
  * @note Options are SUPER_LOOP_OS or TIME_TRIGGER_OS
- * @note in Case of TIME_TRIGGER_OS, OS_PERIOD_MS must be set by the period value in milliseconds.
  */
 
 #define OS              SUPER_LOOP_OS
-#define EEPROM_PERIOD_MS            10U
+
 /**
  * @brief EEPROM Interrupt Configuration
  * @note Options are EEPROM_INTERRUPT_DISABLE or EERPOM_INTERRUPT_ENABLE
