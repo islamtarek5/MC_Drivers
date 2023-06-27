@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-25 12:55:48                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 11:13:44                              *
+ * @LastEditDate          : 2023-06-27 11:50:24                              *
  * @FilePath              : atmega32_reg.h                                   *
  ****************************************************************************/
 
@@ -201,5 +201,39 @@ typedef struct
  * @brief Map EEPROM Registers and their bits to their Memory locations.
  */
 #define EEPROM       ((EEPROM_Reg_S *) EEPROM_BASE_ADDRESS)
-   
+
+/**
+ * @brief Store Program Memory Control Register (SPMCR) and its bits . (R/W Registers except bits (5, 6) which are read-only)
+ * @note SPMCR contains control bits needed to control Boot Loader options.
+ * @note SPMCR initial Value is 0x00.
+ */
+
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t SPMEN    : 1;    
+        uint8_t PGERS    : 1;    
+        uint8_t PGWRT    : 1;    
+        uint8_t BLBSET   : 1;    
+        uint8_t RWWSRE   : 1;    
+        uint8_t Reserved : 1;    
+        uint8_t RWWSB    : 1;    
+        uint8_t SPMIE    : 1;    
+    }bits;
+
+}SPMCR_t;
+
+/**
+ * @brief Store Program Memory Control Register Address.
+ */
+#define SPMCR_ADDRESS            0x57U
+
+/**
+ * @brief Map Store Program Memory Control Register and its bits to its Memory location.
+ */
+#define SPMCR       ((volatile SPMCR_t *) SPMCR_ADDRESS)    
+
+
 #endif
