@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-25 12:55:48                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 10:22:24                              *
+ * @LastEditDate          : 2023-06-27 11:13:44                              *
  * @FilePath              : atmega32_reg.h                                   *
  ****************************************************************************/
 
@@ -195,11 +195,11 @@ typedef struct
 /**
  * @brief EEPROM Base Address.
  */
-#define EEPROM_ADDRESS            0x3CU
+#define EEPROM_BASE_ADDRESS            0x3CU
 
 /**
  * @brief Map EEPROM Registers and their bits to their Memory locations.
  */
-#define EEPROM       ((EEPROM_Reg_S *) EEPROM_ADDRESS)
+#define EEPROM       ((EEPROM_Reg_S *) EEPROM_BASE_ADDRESS)
    
 #endif
