@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:24:09                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 11:15:44                              *
+ * @LastEditDate          : 2023-06-27 12:31:28                              *
  * @FilePath              : EEPROM_prog.c                                    *
  ****************************************************************************/
 
@@ -16,6 +16,12 @@
 #include "EEPROM_cfg.h"
 
 /**
+ * @section Global Variables
+ */
+
+extern driver_err_t DRIVER_ERROR = DRIVER_WITHOUT_ERRORS;
+
+/**
  * @section Implementation
  */
 
@@ -25,8 +31,8 @@
 void EEPROM_init(void)
 {
     /* Set EEPROM Initial Address */
-    ((EEPROM->EEARL).reg) = (EEPROM_INITIAL_ADDRESS << ADDRESS_LSB);
-    ((EEPROM->EEARH).reg) = (EEPROM_INITIAL_ADDRESS << ADDRESS_MSB);
+    ((EEPROM->EEARL).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS << ADDRESS_LEAST));
+    ((EEPROM->EEARH).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS << ADDRESS_MOST));
 
     /* Set EEPROM Ready Interrupt State */
     (((EEPROM->EECR).bits).EERIE) = EEPROM_INTERRUPT;
