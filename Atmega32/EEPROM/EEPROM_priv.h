@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:25:18                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 11:15:01                              *
+ * @LastEditDate          : 2023-06-27 12:14:24                              *
  * @FilePath              : EEPROM_priv.h                                    *
  ****************************************************************************/
 
@@ -28,14 +28,34 @@
 #define EERPOM_INTERRUPT_ENABLE     1U
 
 /**
+ * @brief Boot Loader Options
+ */
+
+#define BOOT_LOADER_NOT_USED        0U
+#define BOOT_LOADER_IS_USED         1U
+
+/**
  * @section Magic Numbers
  */
 
 /**
- * @brief Address Magic Numbers
+ * @brief Address Shift
  */
 
-#define ADDRESS_LSB                 0U    
-#define ADDRESS_MSB                 8U
+#define ADDRESS_LEAST               0U    
+#define ADDRESS_MOST                8U
+
+/**
+ * @brief Conditions Availability
+ */
+
+#define CONITION_NOT_TRUE           1U
+
+/**
+ * @brief EEPROM Boundaries
+ */
+
+#define EEPROM_FIRST_LOCATION       0U
+#define EEPROM_LAST_LOCATION        1023U
 
 #endif
