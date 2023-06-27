@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:24:09                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 15:34:18                              *
+ * @LastEditDate          : 2023-06-27 16:43:49                              *
  * @FilePath              : EEPROM_prog.c                                    *
  ****************************************************************************/
 
@@ -19,8 +19,9 @@
  * @section Global Variables
  */
 
-extern driver_err_t DRIVER_ERROR = DRIVER_WITHOUT_ERRORS;
-static uint8_t EEPROM_WRITE_FLAG = EEPROM_NOT_WRITTEN;
+extern driver_err_t DRIVER_ERROR     = DRIVER_WITHOUT_ERRORS;
+static uint8_t EEPROM_WRITE_FLAG     = EEPROM_NOT_WRITTEN;
+static uint8_t EEPRM_DATA_IS_WRITTEN = EEPROM_NOT_WRITTEN;
 
 /**
  * @section Implementation
@@ -32,9 +33,16 @@ static uint8_t EEPROM_WRITE_FLAG = EEPROM_NOT_WRITTEN;
 void EEPROM_init(void)
 {
     /* Set EEPROM Initial Address */
-    ((EEPROM->EEARL).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS << ADDRESS_LEAST));
-    ((EEPROM->EEARH).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS << ADDRESS_MOST));
-
+    if (EEPROM_INITIAL_ADDRESS <= EEPROM_LAST_LOCATION)
+    {
+        ((EEPROM->EEARL).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS << EEPROM_ADDRESS_LEAST));
+        ((EEPROM->EEARH).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS << EEPROM_ADDRESS_MOST));
+    }
+    else
+    {
+        /* Update Driver Error value */
+        DRIVER_ERROR = DRIVER_ERROR_ADDRESS_NOT_AVAILABLE;
+    }
     /* Set EEPROM Ready Interrupt State */
     (((EEPROM->EECR).bits).EERIE) = EEPROM_INTERRUPT;
 }
@@ -61,11 +69,11 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
     ((SREG->bits).I) = GLOBAL_INTERRUPT_DISABLE;
 
     /* Check if the address in available EEPROM Space */
-    if (address >= EEPROM_FIRST_LOCATION && address <= EEPROM_LAST_LOCATION)
+    if (address <= EEPROM_LAST_LOCATION)
     {
         /* Set the EEPROM Address at which data will be written */
-        ((EEPROM->EEARL).reg) = ((uint8_t)(address << ADDRESS_LEAST));
-        ((EEPROM->EEARH).reg) = ((uint8_t)(address << ADDRESS_MOST));
+        ((EEPROM->EEARL).reg) = ((uint8_t)(address << EEPROM_ADDRESS_LEAST));
+        ((EEPROM->EEARH).reg) = ((uint8_t)(address << EEPROM_ADDRESS_MOST));
 
         /* Set the EEPROM Data */
         ((EEPROM->EEDR).reg) = byte;
@@ -81,7 +89,8 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
     }
     else
     {
-        DRIVER_ERROR = DRIVER_ADDRESS_NOT_AVAILABLE;
+        /* Update Driver Error value */
+        DRIVER_ERROR = DRIVER_ERROR_ADDRESS_NOT_AVAILABLE;
     }
 
 #elif OS == TIME_TRIGGER_OS
@@ -98,11 +107,11 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
         ((SREG->bits).I) = GLOBAL_INTERRUPT_DISABLE;
 
         /* Check if the address in available EEPROM Space */
-        if (address >= EEPROM_FIRST_LOCATION && address <= EEPROM_LAST_LOCATION)
+        if (address <= EEPROM_LAST_LOCATION)
         {
             /* Set the EEPROM Address at which data will be written */
-            ((EEPROM->EEARL).reg) = ((uint8_t)(address << ADDRESS_LEAST));
-            ((EEPROM->EEARH).reg) = ((uint8_t)(address << ADDRESS_MOST));
+            ((EEPROM->EEARL).reg) = ((uint8_t)(address << EEPROM_ADDRESS_LEAST));
+            ((EEPROM->EEARH).reg) = ((uint8_t)(address << EEPROM_ADDRESS_MOST));
 
             /* Set the EEPROM Data */
             ((EEPROM->EEDR).reg) = byte;
@@ -121,7 +130,8 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
         }
         else
         {
-            DRIVER_ERROR = DRIVER_ADDRESS_NOT_AVAILABLE;
+            /* Update Driver Error value */
+            DRIVER_ERROR = DRIVER_ERROR_ADDRESS_NOT_AVAILABLE;
         }
     }
 #else
