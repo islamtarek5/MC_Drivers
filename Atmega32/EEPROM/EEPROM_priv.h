@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:25:18                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 12:14:24                              *
+ * @LastEditDate          : 2023-06-27 13:18:32                              *
  * @FilePath              : EEPROM_priv.h                                    *
  ****************************************************************************/
 
@@ -46,10 +46,9 @@
 #define ADDRESS_MOST                8U
 
 /**
- * @brief Conditions Availability
+ * @brief Write Condition
  */
-
-#define CONITION_NOT_TRUE           1U
+#define EEPROM_WRITE_CONDITION      0U
 
 /**
  * @brief EEPROM Boundaries
