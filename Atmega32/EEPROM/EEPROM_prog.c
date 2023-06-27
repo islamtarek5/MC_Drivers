@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:24:09                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 12:31:28                              *
+ * @LastEditDate          : 2023-06-27 13:15:48                              *
  * @FilePath              : EEPROM_prog.c                                    *
  ****************************************************************************/
 
@@ -38,27 +38,104 @@ void EEPROM_init(void)
     (((EEPROM->EECR).bits).EERIE) = EEPROM_INTERRUPT;
 }
 
+/**
+ * @brief This API is used to write byte of data in specific address in EEPROM.
+ * @param address The Address indicates the location of EEPROM at which data will be written (must be >= 0 and <= 1023).
+ * @param byte Ths Byte of data that will be written in the given address.
+ */
 void EEPROM_write_byte(uint16_t address, uint8_t byte)
 {
+/* Check which OS is used */
+#if OS == SUPER_LOOP_OS
+    /* Wait until EEPROM is ready to be written */
+    while (((((EEPROM->EECR).bits).EEWE) != EEPROM_WRITE_CONDITION))
+    {
+#if BOOT_LOADER_USAGE == BOOT_LOADER_IS_USED
+        /* Wait until CPU finished programming the Flash */
+        while (((SPMCR->bits).SPMEN) != EEPROM_WRITE_CONDITION)
+            ;
+#endif
+    }
+    /* Disable Interrupts */
+    ((SREG->bits).I) = GLOBAL_INTERRUPT_DISABLE;
 
+    /* Check if the address in available EEPROM Space */
+    if (address >= EEPROM_FIRST_LOCATION && address <= EEPROM_LAST_LOCATION)
+    {
+        /* Set the EEPROM Address at which data will be written */
+        ((EEPROM->EEARL).reg) = ((uint8_t)(address << ADDRESS_LEAST));
+        ((EEPROM->EEARH).reg) = ((uint8_t)(address << ADDRESS_MOST));
+    }
+    else
+    {
+        DRIVER_ERROR = DRIVER_ADDRESS_NOT_AVAILABLE;
+    }
+
+    /* Set the EEPROM Data */
+    ((EEPROM->EEDR).reg) = byte;
+
+    /* Set EEPROM Master Write Enable */
+    (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
+
+    /* Set EEPROM Write Enable */
+    (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
+
+    /* Enable Interrupts */
+    ((SREG->bits).I) = GLOBAL_INTERRUPT_ENABLE;
+#elif OS == TIME_TRIGGER_OS
+    /* Check if EEPROM is ready to be written */
+    if (
+        ((((EEPROM->EECR).bits).EEWE) == EEPROM_WRITE_CONDITION)
+#if BOOT_LOADER_USAGE == BOOT_LOADER_IS_USED
+        /* Check if CPU finished programming the Flash */
+        && (((SPMCR->bits).SPMEN) == EEPROM_WRITE_CONDITION)
+#endif
+    )
+    {
+        /* Disable Interrupts */
+        ((SREG->bits).I) = GLOBAL_INTERRUPT_DISABLE;
+
+        /* Check if the address in available EEPROM Space */
+        if (address >= EEPROM_FIRST_LOCATION && address <= EEPROM_LAST_LOCATION)
+        {
+            /* Set the EEPROM Address at which data will be written */
+            ((EEPROM->EEARL).reg) = ((uint8_t)(address << ADDRESS_LEAST));
+            ((EEPROM->EEARH).reg) = ((uint8_t)(address << ADDRESS_MOST));
+        }
+        else
+        {
+            DRIVER_ERROR = DRIVER_ADDRESS_NOT_AVAILABLE;
+        }
+
+        /* Set the EEPROM Data */
+        ((EEPROM->EEDR).reg) = byte;
+
+        /* Set EEPROM Master Write Enable */
+        (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
+
+        /* Set EEPROM Write Enable */
+        (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
+
+        /* Enable Interrupts */
+        ((SREG->bits).I) = GLOBAL_INTERRUPT_ENABLE;
+    }
+#else
+    /* DO Nothing */
+#endif
 }
 
-void EEPROM_write_data(uint16_t base_address, uint8_t * data, uint16_t length)
+void EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length)
 {
-
 }
 
-void EEPROM_read_data(uint16_t base_address, uint8_t * data, uint16_t length)
+void EEPROM_read_data(uint16_t base_address, uint8_t *data, uint16_t length)
 {
-
 }
 
 void EEPROM_enable_interrupt(void)
 {
-
 }
 
 void EEPROM_disable_interrupt(void)
 {
-    
 }
