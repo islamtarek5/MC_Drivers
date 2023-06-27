@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:24:09                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 15:25:13                              *
+ * @LastEditDate          : 2023-06-27 15:34:18                              *
  * @FilePath              : EEPROM_prog.c                                    *
  ****************************************************************************/
 
@@ -20,6 +20,7 @@
  */
 
 extern driver_err_t DRIVER_ERROR = DRIVER_WITHOUT_ERRORS;
+static uint8_t EEPROM_WRITE_FLAG = EEPROM_NOT_WRITTEN;
 
 /**
  * @section Implementation
@@ -65,23 +66,24 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
         /* Set the EEPROM Address at which data will be written */
         ((EEPROM->EEARL).reg) = ((uint8_t)(address << ADDRESS_LEAST));
         ((EEPROM->EEARH).reg) = ((uint8_t)(address << ADDRESS_MOST));
+
+        /* Set the EEPROM Data */
+        ((EEPROM->EEDR).reg) = byte;
+
+        /* Set EEPROM Master Write Enable */
+        (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
+
+        /* Set EEPROM Write Enable */
+        (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
+
+        /* Enable Interrupts */
+        ((SREG->bits).I) = GLOBAL_INTERRUPT_ENABLE;
     }
     else
     {
         DRIVER_ERROR = DRIVER_ADDRESS_NOT_AVAILABLE;
     }
 
-    /* Set the EEPROM Data */
-    ((EEPROM->EEDR).reg) = byte;
-
-    /* Set EEPROM Master Write Enable */
-    (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
-
-    /* Set EEPROM Write Enable */
-    (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
-
-    /* Enable Interrupts */
-    ((SREG->bits).I) = GLOBAL_INTERRUPT_ENABLE;
 #elif OS == TIME_TRIGGER_OS
     /* Check if EEPROM is ready to be written */
     if (
@@ -101,29 +103,31 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
             /* Set the EEPROM Address at which data will be written */
             ((EEPROM->EEARL).reg) = ((uint8_t)(address << ADDRESS_LEAST));
             ((EEPROM->EEARH).reg) = ((uint8_t)(address << ADDRESS_MOST));
+
+            /* Set the EEPROM Data */
+            ((EEPROM->EEDR).reg) = byte;
+
+            /* Set EEPROM Master Write Enable */
+            (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
+
+            /* Set EEPROM Write Enable */
+            (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
+
+            /* Enable Interrupts */
+            ((SREG->bits).I) = GLOBAL_INTERRUPT_ENABLE;
+
+            /* Update Write complere flag */
+            EEPROM_WRITE_FLAG = EEPROM_IS_WRITTEN;
         }
         else
         {
             DRIVER_ERROR = DRIVER_ADDRESS_NOT_AVAILABLE;
         }
-
-        /* Set the EEPROM Data */
-        ((EEPROM->EEDR).reg) = byte;
-
-        /* Set EEPROM Master Write Enable */
-        (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
-
-        /* Set EEPROM Write Enable */
-        (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
-
-        /* Enable Interrupts */
-        ((SREG->bits).I) = GLOBAL_INTERRUPT_ENABLE;
     }
 #else
     /* DO Nothing */
 #endif
 }
-
 
 uint16_t EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length)
 {
