@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 12:07:12                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 16:23:34                              *
+ * @LastEditDate          : 2023-07-01 19:11:55                              *
  * @FilePath              : MC_driver.h                                      *
  ****************************************************************************/
 
@@ -11,21 +11,21 @@
 
 /**
  * @section Definitions
-*/
+ */
 
 /**
  * @brief Bit Values
  */
 
-#define CLEAR_VALUE                 0U
-#define SET_VALUE                   1U
+#define CLEAR_VALUE 0U
+#define SET_VALUE 1U
 
 /**
  * @brief Global Interrupt
  */
 
-#define GLOBAL_INTERRUPT_DISABLE    0U
-#define GLOBAL_INTERRUPT_ENABLE     1U
+#define GLOBAL_INTERRUPT_DISABLE 0U
+#define GLOBAL_INTERRUPT_ENABLE 1U
 
 /**
  * @section Typedefs
@@ -37,10 +37,14 @@
 
 typedef enum
 {
-    DRIVER_WITHOUT_ERRORS = (uint8_t)0,
-    DRIVER_ERROR_ADDRESS_NOT_AVAILABLE,
+    DRIVER_STATUS_IS_NORMAL = (uint8_t)0,
 
-    DRIVER_MAX_ERROR
-}driver_err_t;
+    /* EEPROM Status */
+    EEPROM_ADDRESS_NOT_AVAILABLE,
+    EEPROM_IS_TOTALLY_WRITTEN,
+    EEPROM_IS_TOTALLY_READ,
 
-#endif 
+    DRIVER_MAX_STATUS
+} driver_status_t;
+
+#endif
