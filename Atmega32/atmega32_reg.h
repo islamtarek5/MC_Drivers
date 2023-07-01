@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-25 12:55:48                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 12:11:06                              *
+ * @LastEditDate          : 2023-07-01 20:04:50                              *
  * @FilePath              : atmega32_reg.h                                   *
  ****************************************************************************/
 
@@ -13,7 +13,6 @@
  * @section Includes
  */
 
-#include <stdint.h>
 #include "../MC_driver.h"
 
 /**
