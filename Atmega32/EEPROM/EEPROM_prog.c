@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:24:09                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-07-01 19:43:01                              *
+ * @LastEditDate          : 2023-07-01 19:54:43                              *
  * @FilePath              : EEPROM_prog.c                                    *
  ****************************************************************************/
 
@@ -423,10 +423,23 @@ uint16_t EEPROM_read_data(uint16_t base_address, uint8_t *data, uint16_t length)
     return actual_length;
 }
 
+/**
+ * @brief This API is used to Enable EEPROM Interrupt.
+ */
 void EEPROM_enable_interrupt(void)
 {
+    /* Enable Global Interrupt */
+    ((SREG->bits).I) = GLOBAL_INTERRUPT_ENABLE;
+
+    /* Enable EEPROM Interrupt */
+    (((EEPROM->EECR).bits).EERIE) = EERPOM_INTERRUPT_ENABLE;
 }
 
+/**
+ * @brief This API is used to disable EEPROM Interrupt.
+ */
 void EEPROM_disable_interrupt(void)
 {
+    /* Disable EEPROM interrupt */
+    (((EEPROM->EECR).bits).EERIE) = EEPROM_INTERRUPT_DISABLE;
 }
