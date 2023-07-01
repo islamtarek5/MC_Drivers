@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:24:09                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-07-01 19:31:46                              *
+ * @LastEditDate          : 2023-07-01 19:43:01                              *
  * @FilePath              : EEPROM_prog.c                                    *
  ****************************************************************************/
 
@@ -269,8 +269,158 @@ uint16_t EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length
     return actual_length;
 }
 
+/**
+ * @brief This API is used to read 1 byte or more successive bytes from EEPROM.
+ * @param base_address The start Address from which data will be read.
+ * @param data A pointer to data that will be read from the given addresses in EEPROM.
+ * @param length The length of data that wanted to be read from EEPROM.
+ * @return The Actual size of data that has been read in EEPROM.
+ */
 uint16_t EEPROM_read_data(uint16_t base_address, uint8_t *data, uint16_t length)
 {
+    static uint16_t actual_length = EEPROM_NO_DATA;
+    static uint16_t next_location = EEPROM_NO_ADDRESS;
+
+/* Check which OS is used */
+#if OS == SUPER_LOOP_OS
+
+    /* Check if the location is available or not */
+    while ((next_location <= EEPROM_LAST_LOCATION) && (base_address <= EEPROM_LAST_LOCATION))
+    {
+        /* Check if that is a new call */
+        if (next_location == EEPROM_NO_ADDRESS)
+        {
+            /* Set next location by base address */
+            next_location = base_address;
+
+            /* Reset the actual length */
+            actual_length = EEPROM_NO_DATA;
+        }
+        else
+        {
+            /* Do Nothing */
+        }
+
+        /* check if there is still  data not written yet */
+        if (actual_length < length)
+        {
+            /* Make sure that there is no wirting process is done */
+            while (((((EEPROM->EECR).bits).EEWE) != EEPROM_DATA_REG_IS_AVAILABLE))
+            {
+                /* Do Nothing */
+            }
+
+            /* Set the Address from which data will be read */
+            ((EEPROM->EEARL).reg) = ((uint8_t)(next_location << EEPROM_ADDRESS_LEAST_BYTE));
+            ((EEPROM->EEARH).reg) = ((uint8_t)(next_location << EEPROM_ADDRESS_MOST_BYTE));
+
+            /* Enable EEPROM Read */
+            (((EEPROM->EECR).bits).EERE) = SET_VALUE;
+
+            /* Store the data */
+            data[actual_length] = ((EEPROM->EEDR).reg);
+
+            /* Update next Location */
+            next_location++;
+
+            /* Update the actual length */
+            actual_length++;
+
+            /* Disable EEPROM Read */
+            (((EEPROM->EECR).bits).EERE) = CLEAR_VALUE;
+        }
+        else
+        {
+            /* Reset the next location */
+            next_location = EEPROM_NO_ADDRESS;
+
+            /* Leave the loop */
+            break;
+        }
+    }
+
+    /* Check if the EEPROM reaches the end or not */
+    if ((next_location > EEPROM_LAST_LOCATION) || (base_address > EEPROM_LAST_LOCATION))
+    {
+        /* Update Driver Error value */
+        DRIVER_STATUS = EEPROM_ADDRESS_NOT_AVAILABLE;
+    }
+    else
+    {
+        /* All data is Read */
+        DRIVER_STATUS = EEPROM_IS_TOTALLY_READ;
+    }
+
+#elif OS == TIME_TRIGGER_OS
+    /* Check if the location is available or not */
+    if ((next_location <= EEPROM_LAST_LOCATION) && (base_address <= EEPROM_LAST_LOCATION) && (DRIVER_STATUS == DRIVER_STATUS_IS_NORMAL))
+    {
+        /* Check if that is a new call */
+        if (next_location == EEPROM_NO_ADDRESS)
+        {
+            /* Set next location by base address */
+            next_location = base_address;
+
+            /* Reset the actual length */
+            actual_length = EEPROM_NO_DATA;
+        }
+        else
+        {
+            /* Do Nothing */
+        }
+        if (actual_length < length)
+        {
+            /* Make sure that there is no wirting process is done */
+            if (((((EEPROM->EECR).bits).EEWE) == EEPROM_DATA_REG_IS_AVAILABLE))
+            {
+                /* Set the Address from which data will be read */
+                ((EEPROM->EEARL).reg) = ((uint8_t)(next_location << EEPROM_ADDRESS_LEAST_BYTE));
+                ((EEPROM->EEARH).reg) = ((uint8_t)(next_location << EEPROM_ADDRESS_MOST_BYTE));
+
+                /* Enable EEPROM Read */
+                (((EEPROM->EECR).bits).EERE) = SET_VALUE;
+
+                /* Store the data */
+                data[actual_length] = ((EEPROM->EEDR).reg);
+
+                /* Update next Location */
+                next_location++;
+
+                /* Update the actual length */
+                actual_length++;
+
+                /* Disable EEPROM Read */
+                (((EEPROM->EECR).bits).EERE) = CLEAR_VALUE;
+            }
+            else
+            {
+                /* Do Nothing */
+            }
+        }
+        else
+        {
+            /* All Data is Read */
+            DRIVER_STATUS = EEPROM_IS_TOTALLY_READ;
+
+            /* Reset next location */
+            next_location == EEPROM_NO_ADDRESS;
+        }
+    }
+    else if ((next_location > EEPROM_LAST_LOCATION) || (base_address > EEPROM_LAST_LOCATION))
+    {
+        /* Update Driver Error value */
+        DRIVER_STATUS = EEPROM_ADDRESS_NOT_AVAILABLE;
+    }
+    else
+    {
+        /* Do Nothing*/
+    }
+
+#else
+    /* Do Nothing */
+#endif
+
+    return actual_length;
 }
 
 void EEPROM_enable_interrupt(void)
