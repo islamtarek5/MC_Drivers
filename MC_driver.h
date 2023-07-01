@@ -2,12 +2,18 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 12:07:12                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-07-01 19:11:55                              *
+ * @LastEditDate          : 2023-07-01 20:03:39                              *
  * @FilePath              : MC_driver.h                                      *
  ****************************************************************************/
 
 #ifndef MC_DRIVERS_MC_DRIVER_H_
 #define MC_DRIVERS_MC_DRIVER_H_
+
+/**
+ * @section Includes
+ */
+
+#include <stdint.h>
 
 /**
  * @section Definitions
