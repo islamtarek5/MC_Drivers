@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:24:09                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-06-27 16:59:31                              *
+ * @LastEditDate          : 2023-07-01 19:31:46                              *
  * @FilePath              : EEPROM_prog.c                                    *
  ****************************************************************************/
 
@@ -19,9 +19,8 @@
  * @section Global Variables
  */
 
-extern driver_err_t DRIVER_ERROR     = DRIVER_WITHOUT_ERRORS;
-static uint8_t EEPROM_WRITE_FLAG     = EEPROM_NOT_WRITTEN;
-static uint8_t EEPRM_DATA_IS_WRITTEN = EEPROM_NOT_WRITTEN;
+extern driver_status_t DRIVER_STATUS = DRIVER_STATUS_IS_NORMAL;
+static uint8_t EEPROM_WRITE_FLAG = EEPROM_NOT_WRITTEN;
 
 /**
  * @section Implementation
@@ -35,13 +34,13 @@ void EEPROM_init(void)
     /* Set EEPROM Initial Address */
     if (EEPROM_INITIAL_ADDRESS <= EEPROM_LAST_LOCATION)
     {
-        ((EEPROM->EEARL).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS << EEPROM_ADDRESS_LEAST));
-        ((EEPROM->EEARH).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS << EEPROM_ADDRESS_MOST));
+        ((EEPROM->EEARL).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS << EEPROM_ADDRESS_LEAST_BYTE));
+        ((EEPROM->EEARH).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS << EEPROM_ADDRESS_MOST_BYTE));
     }
     else
     {
         /* Update Driver Error value */
-        DRIVER_ERROR = DRIVER_ERROR_ADDRESS_NOT_AVAILABLE;
+        DRIVER_STATUS = EEPROM_ADDRESS_NOT_AVAILABLE;
     }
     /* Set EEPROM Ready Interrupt State */
     (((EEPROM->EECR).bits).EERIE) = EEPROM_INTERRUPT;
@@ -57,7 +56,7 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
 /* Check which OS is used */
 #if OS == SUPER_LOOP_OS
     /* Wait until EEPROM is ready to be written */
-    while (((((EEPROM->EECR).bits).EEWE) != EEPROM_WRITE_CONDITION))
+    while (((((EEPROM->EECR).bits).EEWE) != EEPROM_DATA_REG_IS_AVAILABLE))
     {
 #if BOOT_LOADER_USAGE == BOOT_LOADER_IS_USED
         /* Wait until CPU finished programming the Flash */
@@ -72,8 +71,8 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
     if (address <= EEPROM_LAST_LOCATION)
     {
         /* Set the EEPROM Address at which data will be written */
-        ((EEPROM->EEARL).reg) = ((uint8_t)(address << EEPROM_ADDRESS_LEAST));
-        ((EEPROM->EEARH).reg) = ((uint8_t)(address << EEPROM_ADDRESS_MOST));
+        ((EEPROM->EEARL).reg) = ((uint8_t)(address << EEPROM_ADDRESS_LEAST_BYTE));
+        ((EEPROM->EEARH).reg) = ((uint8_t)(address << EEPROM_ADDRESS_MOST_BYTE));
 
         /* Set the EEPROM Data */
         ((EEPROM->EEDR).reg) = byte;
@@ -90,13 +89,13 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
     else
     {
         /* Update Driver Error value */
-        DRIVER_ERROR = DRIVER_ERROR_ADDRESS_NOT_AVAILABLE;
+        DRIVER_STATUS = EEPROM_ADDRESS_NOT_AVAILABLE;
     }
 
 #elif OS == TIME_TRIGGER_OS
     /* Check if EEPROM is ready to be written */
     if (
-        ((((EEPROM->EECR).bits).EEWE) == EEPROM_WRITE_CONDITION)
+        ((((EEPROM->EECR).bits).EEWE) == EEPROM_DATA_REG_IS_AVAILABLE)
 #if BOOT_LOADER_USAGE == BOOT_LOADER_IS_USED
         /* Check if CPU finished programming the Flash */
         && (((SPMCR->bits).SPMEN) == EEPROM_WRITE_CONDITION)
@@ -110,8 +109,8 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
         if (address <= EEPROM_LAST_LOCATION)
         {
             /* Set the EEPROM Address at which data will be written */
-            ((EEPROM->EEARL).reg) = ((uint8_t)(address << EEPROM_ADDRESS_LEAST));
-            ((EEPROM->EEARH).reg) = ((uint8_t)(address << EEPROM_ADDRESS_MOST));
+            ((EEPROM->EEARL).reg) = ((uint8_t)(address << EEPROM_ADDRESS_LEAST_BYTE));
+            ((EEPROM->EEARH).reg) = ((uint8_t)(address << EEPROM_ADDRESS_MOST_BYTE));
 
             /* Set the EEPROM Data */
             ((EEPROM->EEDR).reg) = byte;
@@ -131,7 +130,7 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
         else
         {
             /* Update Driver Error value */
-            DRIVER_ERROR = DRIVER_ERROR_ADDRESS_NOT_AVAILABLE;
+            DRIVER_STATUS = EEPROM_ADDRESS_NOT_AVAILABLE;
         }
     }
 #else
@@ -148,8 +147,8 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
  */
 uint16_t EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length)
 {
-    static uint16_t actual_length = EEPROM_NO_DATA_WRITTEN;
-    static uint16_t next_location = EEPROM_NO_ADDRESS_SET;
+    static uint16_t actual_length = EEPROM_NO_DATA;
+    static uint16_t next_location = EEPROM_NO_ADDRESS;
 
 /* Check which OS is used */
 #if OS == SUPER_LOOP_OS
@@ -158,13 +157,13 @@ uint16_t EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length
     while ((next_location <= EEPROM_LAST_LOCATION) && (base_address <= EEPROM_LAST_LOCATION))
     {
         /* Check if that is a new call */
-        if (next_location == EEPROM_NO_ADDRESS_SET)
+        if (next_location == EEPROM_NO_ADDRESS)
         {
             /* Set next location by base address */
             next_location = base_address;
 
             /* Reset the actual length */
-            actual_length = EEPROM_NO_DATA_WRITTEN;
+            actual_length = EEPROM_NO_DATA;
         }
         else
         {
@@ -178,14 +177,14 @@ uint16_t EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length
             EEPROM_write_byte(next_location, data[actual_length]);
 
             /* Update next Location */
-            next_location ++;
+            next_location++;
             /* Update the actual length */
-            actual_length ++;
+            actual_length++;
         }
         else
         {
             /* Reset the next location */
-            next_location = EEPROM_NO_ADDRESS_SET;
+            next_location = EEPROM_NO_ADDRESS;
 
             /* Leave the loop */
             break;
@@ -196,25 +195,26 @@ uint16_t EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length
     if ((next_location > EEPROM_LAST_LOCATION) || (base_address > EEPROM_LAST_LOCATION))
     {
         /* Update Driver Error value */
-        DRIVER_ERROR = DRIVER_ERROR_ADDRESS_NOT_AVAILABLE;
+        DRIVER_STATUS = EEPROM_ADDRESS_NOT_AVAILABLE;
     }
     else
     {
-        /* Do Nothing */
+        /* All data is written */
+        DRIVER_STATUS = EEPROM_IS_TOTALLY_WRITTEN;
     }
 
 #elif OS == TIME_TRIGGER_OS
     /* Check if the location is available or not */
-    if ((next_location <= EEPROM_LAST_LOCATION) && (base_address <= EEPROM_LAST_LOCATION) && (EEPRM_DATA_IS_WRITTEN == EEPROM_NOT_WRITTEN))
+    if ((next_location <= EEPROM_LAST_LOCATION) && (base_address <= EEPROM_LAST_LOCATION) && (DRIVER_STATUS == DRIVER_STATUS_IS_NORMAL))
     {
         /* Check if that is a new call */
-        if (next_location == EEPROM_NO_ADDRESS_SET)
+        if (next_location == EEPROM_NO_ADDRESS)
         {
             /* Set next location by base address */
             next_location = base_address;
 
             /* Reset the actual length */
-            actual_length = EEPROM_NO_DATA_WRITTEN;
+            actual_length = EEPROM_NO_DATA;
         }
         else
         {
@@ -234,9 +234,9 @@ uint16_t EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length
             if (EEPROM_WRITE_FLAG == EEPROM_IS_WRITTEN)
             {
                 /* Update next Location */
-                next_location ++;
+                next_location++;
                 /* Update the actual length */
-                actual_length ++;
+                actual_length++;
             }
             else
             {
@@ -245,22 +245,21 @@ uint16_t EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length
         }
         else
         {
+            /* All data has been written */
+            DRIVER_STATUS = EEPROM_IS_TOTALLY_WRITTEN;
+
             /* Reset the next location */
-            next_location = EEPROM_NO_ADDRESS_SET;
-            
-            /* Update data is written flag */
-            EEPRM_DATA_IS_WRITTEN = EEPROM_IS_WRITTEN;
+            next_location = EEPROM_NO_ADDRESS;
         }
     }
     else if ((next_location > EEPROM_LAST_LOCATION) || (base_address > EEPROM_LAST_LOCATION))
     {
         /* Update Driver Error value */
-        DRIVER_ERROR = DRIVER_ERROR_ADDRESS_NOT_AVAILABLE;
+        DRIVER_STATUS = EEPROM_ADDRESS_NOT_AVAILABLE;
     }
     else
     {
-        /* Reset data is written flag */
-        EEPRM_DATA_IS_WRITTEN = EEPROM_NOT_WRITTEN;
+        /* Do Nothing */
     }
 
 #else
