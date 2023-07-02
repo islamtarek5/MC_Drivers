@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 12:07:12                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-07-01 20:03:39                              *
+ * @LastEditDate          : 2023-07-02 12:43:00                              *
  * @FilePath              : MC_driver.h                                      *
  ****************************************************************************/
 
@@ -43,12 +43,14 @@
 
 typedef enum
 {
-    DRIVER_STATUS_IS_NORMAL = (uint8_t)0,
+    DRIVER_IS_OK = (uint8_t)0,
 
     /* EEPROM Status */
     EEPROM_ADDRESS_NOT_AVAILABLE,
-    EEPROM_IS_TOTALLY_WRITTEN,
-    EEPROM_IS_TOTALLY_READ,
+    EEPROM_DATA_IS_WRITTEN,
+    EEPROM_DATA_IS_NOT_COMPLETELY_WRITTEN,
+    EEPROM_DATA_IS_READ,
+    EEPROM_DATA_IS_NOT_COMPLETELY_READ,
 
     DRIVER_MAX_STATUS
 } driver_status_t;
