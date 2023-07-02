@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:24:09                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-07-01 19:54:43                              *
+ * @LastEditDate          : 2023-07-02 14:00:39                              *
  * @FilePath              : EEPROM_prog.c                                    *
  ****************************************************************************/
 
@@ -19,7 +19,6 @@
  * @section Global Variables
  */
 
-extern driver_status_t DRIVER_STATUS = DRIVER_STATUS_IS_NORMAL;
 static uint8_t EEPROM_WRITE_FLAG = EEPROM_NOT_WRITTEN;
 
 /**
@@ -28,22 +27,29 @@ static uint8_t EEPROM_WRITE_FLAG = EEPROM_NOT_WRITTEN;
 
 /**
  * @brief This API is used to Initialize EEPROM with given Configurations (Address, Interrupt state).
+ * @return The status of EEPROM (DRIVER_IS_OK or EEPROM_ADDRESS_NOT_AVAILABLE).
  */
-void EEPROM_init(void)
+driver_status_t EEPROM_init(void)
 {
-    /* Set EEPROM Initial Address */
+    driver_status_t EEPROM_status = DRIVER_IS_OK;
+
+    /* Check if location is available or not */
     if (EEPROM_INITIAL_ADDRESS <= EEPROM_LAST_LOCATION)
     {
-        ((EEPROM->EEARL).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS << EEPROM_ADDRESS_LEAST_BYTE));
-        ((EEPROM->EEARH).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS << EEPROM_ADDRESS_MOST_BYTE));
+        /* Set EEPROM Initial Address */
+        ((EEPROM->EEARL).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS >> EEPROM_ADDRESS_LEAST_BYTE));
+        ((EEPROM->EEARH).reg) = ((uint8_t)(EEPROM_INITIAL_ADDRESS >> EEPROM_ADDRESS_MOST_BYTE));
     }
     else
     {
-        /* Update Driver Error value */
-        DRIVER_STATUS = EEPROM_ADDRESS_NOT_AVAILABLE;
+        /* EEPROM Address is not available */
+        EEPROM_status = EEPROM_ADDRESS_NOT_AVAILABLE;
     }
     /* Set EEPROM Ready Interrupt State */
     (((EEPROM->EECR).bits).EERIE) = EEPROM_INTERRUPT;
+
+    /* Return EEPROM status */
+    return EEPROM_status;
 }
 
 /**
