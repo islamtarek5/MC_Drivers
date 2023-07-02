@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:24:09                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-07-02 16:32:08                              *
+ * @LastEditDate          : 2023-07-02 17:28:58                              *
  * @FilePath              : EEPROM_prog.c                                    *
  ****************************************************************************/
 
@@ -115,136 +115,80 @@ driver_status_t EEPROM_write_byte(uint16_t address, uint8_t byte)
 return EEPROM_status;
 }
 
-
 /**
  * @brief This API is used to write more than byte of data in successive addresses in EEPROM.
  * @param base_address The start Address at which data will be written.
  * @param data A pointer to data that will be written in the given addresses in EEPROM.
  * @param length The length of data that wanted to be written in EEPROM.
- * @return The Actual size of data that has been written in EEPROM.
+ * @param actual_length A pointer to length of data that has been actually written in EEPROM.
+ * @return The Actual length of data that has been written in EEPROM and
+ * the status of EEPROM (EEPROM_DATA_IS_WRITTEN, EEPROM_ADDRESS_NOT_AVAILABLE or EEPROM_DATA_IS_NOT_COMPLETELY_WRITTEN).
  */
-uint16_t EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length)
+driver_status_t EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t length, uint16_t *actual_length)
 {
-    static uint16_t actual_length = EEPROM_NO_DATA;
+    driver_status_t EEPROM_status = DRIVER_IS_OK;
     static uint16_t next_location = EEPROM_NO_ADDRESS;
 
+    /* Check if the Base Address is available or not */
+    if (base_address <= EEPROM_LAST_LOCATION)
+    {
 /* Check which OS is used */
 #if OS == SUPER_LOOP_OS
-
-    /* Check if the location is available or not */
-    while ((next_location <= EEPROM_LAST_LOCATION) && (base_address <= EEPROM_LAST_LOCATION))
-    {
-        /* Check if that is a new call */
-        if (next_location == EEPROM_NO_ADDRESS)
-        {
-            /* Set next location by base address */
-            next_location = base_address;
-
-            /* Reset the actual length */
-            actual_length = EEPROM_NO_DATA;
-        }
-        else
-        {
-            /* Do Nothing */
-        }
-
-        /* check if there is still  data not written yet */
-        if (actual_length < length)
-        {
-            /* Write data of the given index */
-            EEPROM_write_byte(next_location, data[actual_length]);
-
-            /* Update next Location */
-            next_location++;
-            /* Update the actual length */
-            actual_length++;
-        }
-        else
-        {
-            /* Reset the next location */
-            next_location = EEPROM_NO_ADDRESS;
-
-            /* Leave the loop */
-            break;
-        }
-    }
-
-    /* Check if the EEPROM reaches the end or not */
-    if ((next_location > EEPROM_LAST_LOCATION) || (base_address > EEPROM_LAST_LOCATION))
-    {
-        /* Update Driver Error value */
-        DRIVER_STATUS = EEPROM_ADDRESS_NOT_AVAILABLE;
-    }
-    else
-    {
-        /* All data is written */
-        DRIVER_STATUS = EEPROM_IS_TOTALLY_WRITTEN;
-    }
-
+        while
 #elif OS == TIME_TRIGGER_OS
-    /* Check if the location is available or not */
-    if ((next_location <= EEPROM_LAST_LOCATION) && (base_address <= EEPROM_LAST_LOCATION) && (DRIVER_STATUS == DRIVER_STATUS_IS_NORMAL))
-    {
-        /* Check if that is a new call */
-        if (next_location == EEPROM_NO_ADDRESS)
+        if
+#endif
+            /* Check if there is still data need to be written */
+            ((*actual_length < length) && (next_location <= EEPROM_LAST_LOCATION))
         {
-            /* Set next location by base address */
-            next_location = base_address;
-
-            /* Reset the actual length */
-            actual_length = EEPROM_NO_DATA;
-        }
-        else
-        {
-            /* Do Nothing */
-        }
-
-        /* check if there is still  data not written yet */
-        if (actual_length < length)
-        {
-
-            /* Reset EEPROM Write Flag */
-            EEPROM_WRITE_FLAG = EEPROM_NOT_WRITTEN;
-
+            /* Check if that is a new data block */
+            if (*actual_length == EEPROM_NO_DATA)
+            {
+                /* Set next location by base address */
+                next_location = base_address;
+            }
+            else
+            {
+                /* Do Nothing */
+            }
             /* Write data of the given index */
-            EEPROM_write_byte(next_location, data[actual_length]);
+            EEPROM_status = EEPROM_write_byte(next_location, data[*actual_length]);
 
-            if (EEPROM_WRITE_FLAG == EEPROM_IS_WRITTEN)
+            /* Check if the Data is written or not */
+            if (EEPROM_status == EEPROM_DATA_IS_WRITTEN)
             {
                 /* Update next Location */
                 next_location++;
                 /* Update the actual length */
-                actual_length++;
+                (*actual_length)++;
             }
             else
             {
                 /* Do Nothing */
             }
         }
+#if OS == TIME_TRIGGER_OS
+        else
+#endif
+        if (*actual_length >= length)
+        {
+            /* All Data has been written */
+            EEPROM_status = EEPROM_DATA_IS_WRITTEN;
+        }
         else
         {
-            /* All data has been written */
-            DRIVER_STATUS = EEPROM_IS_TOTALLY_WRITTEN;
-
-            /* Reset the next location */
-            next_location = EEPROM_NO_ADDRESS;
+            /* Not All Data has been written */
+            EEPROM_status = EEPROM_DATA_IS_NOT_COMPLETELY_WRITTEN;
         }
-    }
-    else if ((next_location > EEPROM_LAST_LOCATION) || (base_address > EEPROM_LAST_LOCATION))
-    {
-        /* Update Driver Error value */
-        DRIVER_STATUS = EEPROM_ADDRESS_NOT_AVAILABLE;
     }
     else
     {
-        /* Do Nothing */
+        /* EEPROM Base Address is not available */
+        EEPROM_status = EEPROM_ADDRESS_NOT_AVAILABLE;
     }
 
-#else
-    /* Do Nothing */
-#endif
-
-    return actual_length;
+    /* Return EEPROM status */
+    return EEPROM_status;
 }
 
 /**
