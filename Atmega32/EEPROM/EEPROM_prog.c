@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:24:09                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-07-02 14:00:39                              *
+ * @LastEditDate          : 2023-07-02 16:29:36                              *
  * @FilePath              : EEPROM_prog.c                                    *
  ****************************************************************************/
 
@@ -14,12 +14,6 @@
 #include "EEPROM_int.h"
 #include "EEPROM_priv.h"
 #include "EEPROM_cfg.h"
-
-/**
- * @section Global Variables
- */
-
-static uint8_t EEPROM_WRITE_FLAG = EEPROM_NOT_WRITTEN;
 
 /**
  * @section Implementation
@@ -56,9 +50,11 @@ driver_status_t EEPROM_init(void)
  * @brief This API is used to write byte of data in specific address in EEPROM.
  * @param address The Address indicates the location of EEPROM at which data will be written (must be >= 0 and <= 1023).
  * @param byte Ths Byte of data that will be written in the given address.
+ * @return The status of EEPROM (EEPROM_ADDRESS_NOT_AVAILABLE or EEPROM_DATA_IS_WRITTEN).
  */
-void EEPROM_write_byte(uint16_t address, uint8_t byte)
+driver_status_t EEPROM_write_byte(uint16_t address, uint8_t byte)
 {
+    driver_status_t EEPROM_status = DRIVER_IS_OK;
 /* Check which OS is used */
 #if OS == SUPER_LOOP_OS
     /* Wait until EEPROM is ready to be written */
@@ -70,34 +66,6 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
             ;
 #endif
     }
-    /* Disable Interrupts */
-    ((SREG->bits).I) = GLOBAL_INTERRUPT_DISABLE;
-
-    /* Check if the address in available EEPROM Space */
-    if (address <= EEPROM_LAST_LOCATION)
-    {
-        /* Set the EEPROM Address at which data will be written */
-        ((EEPROM->EEARL).reg) = ((uint8_t)(address << EEPROM_ADDRESS_LEAST_BYTE));
-        ((EEPROM->EEARH).reg) = ((uint8_t)(address << EEPROM_ADDRESS_MOST_BYTE));
-
-        /* Set the EEPROM Data */
-        ((EEPROM->EEDR).reg) = byte;
-
-        /* Set EEPROM Master Write Enable */
-        (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
-
-        /* Set EEPROM Write Enable */
-        (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
-
-        /* Enable Interrupts */
-        ((SREG->bits).I) = GLOBAL_INTERRUPT_ENABLE;
-    }
-    else
-    {
-        /* Update Driver Error value */
-        DRIVER_STATUS = EEPROM_ADDRESS_NOT_AVAILABLE;
-    }
-
 #elif OS == TIME_TRIGGER_OS
     /* Check if EEPROM is ready to be written */
     if (
@@ -108,41 +76,45 @@ void EEPROM_write_byte(uint16_t address, uint8_t byte)
 #endif
     )
     {
-        /* Disable Interrupts */
-        ((SREG->bits).I) = GLOBAL_INTERRUPT_DISABLE;
-
-        /* Check if the address in available EEPROM Space */
-        if (address <= EEPROM_LAST_LOCATION)
-        {
-            /* Set the EEPROM Address at which data will be written */
-            ((EEPROM->EEARL).reg) = ((uint8_t)(address << EEPROM_ADDRESS_LEAST_BYTE));
-            ((EEPROM->EEARH).reg) = ((uint8_t)(address << EEPROM_ADDRESS_MOST_BYTE));
-
-            /* Set the EEPROM Data */
-            ((EEPROM->EEDR).reg) = byte;
-
-            /* Set EEPROM Master Write Enable */
-            (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
-
-            /* Set EEPROM Write Enable */
-            (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
-
-            /* Enable Interrupts */
-            ((SREG->bits).I) = GLOBAL_INTERRUPT_ENABLE;
-
-            /* Update Write complere flag */
-            EEPROM_WRITE_FLAG = EEPROM_IS_WRITTEN;
-        }
-        else
-        {
-            /* Update Driver Error value */
-            DRIVER_STATUS = EEPROM_ADDRESS_NOT_AVAILABLE;
-        }
-    }
-#else
-    /* DO Nothing */
 #endif
+    /* Disable Interrupts */
+    ((SREG->bits).I) = GLOBAL_INTERRUPT_DISABLE;
+
+    /* Check if the address in available EEPROM Space */
+    if (address <= EEPROM_LAST_LOCATION)
+    {
+        /* Set the EEPROM Address at which data will be written */
+        ((EEPROM->EEARL).reg) = ((uint8_t)(address >> EEPROM_ADDRESS_LEAST_BYTE));
+        ((EEPROM->EEARH).reg) = ((uint8_t)(address >> EEPROM_ADDRESS_MOST_BYTE));
+
+        /* Set the EEPROM Data */
+        ((EEPROM->EEDR).reg) = byte;
+
+        /* Set EEPROM Master Write Enable */
+        (((EEPROM->EECR).bits).EEMWE) = SET_VALUE;
+
+        /* Set EEPROM Write Enable */
+        ((EEPROM->EECR).reg) = EEPROM_WRITE_ENABLE_CONDITION;
+
+        /* Enable Interrupts */
+        ((SREG->bits).I) = GLOBAL_INTERRUPT_ENABLE;
+
+        /* Data is written */
+        EEPROM_status = EEPROM_DATA_IS_WRITTEN;
+    }
+    else
+    {
+        /* Update Driver Error value */
+        EEPROM_status = EEPROM_ADDRESS_NOT_AVAILABLE;
+    }
+#if OS == TIME_TRIGGER_OS
 }
+#endif
+
+/* Return EEPROM status */
+return EEPROM_status;
+}
+
 
 /**
  * @brief This API is used to write more than byte of data in successive addresses in EEPROM.

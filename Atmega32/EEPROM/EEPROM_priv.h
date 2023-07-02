@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-27 10:25:18                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-07-01 19:34:29                              *
+ * @LastEditDate          : 2023-07-02 15:42:28                              *
  * @FilePath              : EEPROM_priv.h                                    *
  ****************************************************************************/
 
@@ -50,6 +50,7 @@
  * @brief Write Condition
  */
 #define EEPROM_WRITE_CONDITION          0U
+#define EEPROM_WRITE_ENABLE_CONDITION   2U
 
 /**
  * @brief Data Register can be processed.
