@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-25 12:55:48                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-07-01 20:04:50                              *
+ * @LastEditDate          : 2023-08-04 19:33:57                              *
  * @FilePath              : atmega32_reg.h                                   *
  ****************************************************************************/
 
@@ -235,5 +235,42 @@ typedef union
  */
 #define SPMCR       ((volatile SPMCR_t *) SPMCR_ADDRESS)    
 
+/**
+ * @brief Oscillator Calibration Register (OSCCAL) and its bits . (R/W Register)
+ * @note OSCCAL contatians the Internal RC Calibration Value.
+ * @note If the internal RC is used as 1MHZ, the OSCCAL Value will be loaded automatically from signature row high byte.
+ * @note If the internal RC isn't used as 1MHZ, the OSCCAL value must be loaded manually. 
+ * @note OSCCAL Values can be 0x00, 0x7F or 0xFF.
+ * @note OSCAL Value 0x00 (min: 50%  , max: 100% of Nominal frequency).
+ * @note OSCAL Value 0x7F (min: 75%  , max: 150% of Nominal frequency).
+ * @note OSCAL Value 0xFF (min: 100% , max: 200% of Nominal frequency).
+ */
+
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t CAL0    : 1;    /* Calibration bit 0 */
+        uint8_t CAL1    : 1;    /* Calibration bit 1 */
+        uint8_t CAL2    : 1;    /* Calibration bit 2 */
+        uint8_t CAL3    : 1;    /* Calibration bit 3 */
+        uint8_t CAL4    : 1;    /* Calibration bit 4 */
+        uint8_t CAL5    : 1;    /* Calibration bit 5 */
+        uint8_t CAL6    : 1;    /* Calibration bit 6 */
+        uint8_t CAL7    : 1;    /* Calibration bit 7 */
+    }bits;
+
+}OSCCAL_t;
+
+/**
+ * @brief Oscillator Calibration Register Address.
+ */
+#define OSCCAL_ADDRESS            0x51U
+
+/**
+ * @brief Map Oscillator Calibration Register and its bits to its Memory location.
+ */
+#define OSCAL       ((volatile OSCCAL_t *) OSCCAL_ADDRESS)    
 
 #endif
