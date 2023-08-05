@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-25 12:55:48                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-08-04 19:33:57                              *
+ * @LastEditDate          : 2023-08-05 17:45:25                              *
  * @FilePath              : atmega32_reg.h                                   *
  ****************************************************************************/
 
@@ -271,6 +271,37 @@ typedef union
 /**
  * @brief Map Oscillator Calibration Register and its bits to its Memory location.
  */
-#define OSCAL       ((volatile OSCCAL_t *) OSCCAL_ADDRESS)    
+#define OSCAL       ((volatile OSCCAL_t *) OSCCAL_ADDRESS) 
+
+/**
+ * @brief MCU Control Register (MCUCR) and its bits . (R/W Register)
+ * @note MCUCR is used to control Sleep modes and power management.
+ * @note MCUCR initial Value is 0x00.
+ */
+
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t ISC00    : 1;    // TODO 
+        uint8_t ISC01    : 1;    // TODO 
+        uint8_t ISC10    : 1;    // TODO 
+        uint8_t ISC11    : 1;    // TODO 
+        uint8_t SM       : 3;    /* Sleep Mode Select Bits */
+        uint8_t SE       : 1;    /* Sleep Enable Bit       */
+    }bits;
+
+}MCUCR_t;
+
+/**
+ * @brief MCU Control Register Address.
+ */
+#define MCUCR_ADDRESS            0x55U
+
+/**
+ * @brief Map MCU Control Register and its bits to its Memory location.
+ */
+#define MCUCR       ((volatile MCUCR_t *) MCUCR_ADDRESS)    
 
 #endif
