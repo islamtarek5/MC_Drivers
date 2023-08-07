@@ -1,8 +1,8 @@
 /*****************************************************************************
- * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
+ * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2023-06-27 12:07:12                              *
- * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-07-02 13:56:15                              *
+ * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
+ * @LastEditDate          : 2023-08-08 00:22:32                              *
  * @FilePath              : MC_driver.h                                      *
  ****************************************************************************/
 
@@ -44,7 +44,9 @@
 typedef enum
 {
     DRIVER_IS_OK = (uint8_t)0,
-  
+    VALUE_IS_NOT_EXISTED,
+    PTR_USED_IS_NULL_PTR,
+
     /* EEPROM Status */
     EEPROM_ADDRESS_NOT_AVAILABLE,
     EEPROM_DATA_IS_WRITTEN,
