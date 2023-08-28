@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
  * @CreatedDate           : 2023-06-25 12:55:48                              *
  * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-08-05 17:45:25                              *
+ * @LastEditDate          : 2023-08-28 11:23:53                              *
  * @FilePath              : atmega32_reg.h                                   *
  ****************************************************************************/
 
@@ -52,6 +52,7 @@ typedef union
  * @brief Map Status Register and its bits to its Memory location.
  */
 #define SREG       ((volatile SREG_t *) SREG_ADDRESS)    
+
 
 /**
  * @brief Stack Pointer Registers and their bits . (R/W Registers)
@@ -105,6 +106,7 @@ typedef union
  */
 #define SPL       ((volatile SPL_t *) SPL_ADDRESS)  
 #define SPH       ((volatile SPH_t *) SPH_ADDRESS)
+
 
 /**
  * @brief EEPROM Registers and Their bits .
@@ -191,7 +193,6 @@ typedef struct
     volatile EEARH_t EEARH;
 }EEPROM_Reg_S;
 
-
 /**
  * @brief EEPROM Base Address.
  */
@@ -201,6 +202,7 @@ typedef struct
  * @brief Map EEPROM Registers and their bits to their Memory locations.
  */
 #define EEPROM       ((EEPROM_Reg_S *) EEPROM_BASE_ADDRESS)
+
 
 /**
  * @brief Store Program Memory Control Register (SPMCR) and its bits . (R/W Registers except bits (5, 6) which are read-only)
@@ -234,6 +236,7 @@ typedef union
  * @brief Map Store Program Memory Control Register and its bits to its Memory location.
  */
 #define SPMCR       ((volatile SPMCR_t *) SPMCR_ADDRESS)    
+
 
 /**
  * @brief Oscillator Calibration Register (OSCCAL) and its bits . (R/W Register)
@@ -273,6 +276,7 @@ typedef union
  */
 #define OSCAL       ((volatile OSCCAL_t *) OSCCAL_ADDRESS) 
 
+
 /**
  * @brief MCU Control Register (MCUCR) and its bits . (R/W Register)
  * @note MCUCR is used to control Sleep modes and power management.
@@ -303,5 +307,128 @@ typedef union
  * @brief Map MCU Control Register and its bits to its Memory location.
  */
 #define MCUCR       ((volatile MCUCR_t *) MCUCR_ADDRESS)    
+
+
+/**
+ * @brief Special Function Input/output Register (SFIOR) and its bits . (R/W Register Except bit 4)
+ * @note SFIOR contains Pull-up Disable bit (PUD) which can be used to diable all internal Pull-up.
+ * @note SFIOR initial Value is 0x00.
+ */
+
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t PSR10    : 1;    //TODO 
+        uint8_t PSR2     : 1;    //TODO 
+        uint8_t PUD      : 1;    /* Pull-up disable */
+        uint8_t ACME     : 1;    //TODO 
+        uint8_t Reserved : 1;    /* Reserved bit    */
+        uint8_t ADTS0    : 1;    //TODO 
+        uint8_t ADTS1    : 1;    //TODO 
+        uint8_t ADTS2    : 1;    //TODO 
+    }bits;
+
+}SFIOR_t;
+
+/**
+ * @brief SFIOR Address.
+ */
+#define SFIOR_ADDRESS            0x50U
+
+/**
+ * @brief Map SFIOR and its bits to its Memory location.
+ */
+#define SFIOR       ((volatile SFIOR_t *) SFIOR_ADDRESS)    
+
+
+/**
+ * @brief GPIO Registers and their pins.
+ * @note Port Input Pins Register (PIN) and its bits. (Read only Register)
+ * @note PIN contains the input value of the MCU pins.
+ * @note PIN initial Value is unknown (N/A, floating value).
+ * @note Port Data Direction Register (DDR) and its bits. (R/W Register)
+ * @note DDR is used to control the pin direction of MCU either Input or output.
+ * @note DDR initial Value is 0x00 (Pins are input initially).
+ * @note Port Data Register (PORT) and its bits. (R/W Register)
+ * @note PORT contains the value by which pin will be driven as output.
+ * @note PORT initial Value is 0x00 (Pins has low level initially).
+ */
+
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t PIN0: 1;  /* Port Input Bit0 */  
+        uint8_t PIN1: 1;  /* Port Input Bit1 */   
+        uint8_t PIN2: 1;  /* Port Input Bit2 */  
+        uint8_t PIN3: 1;  /* Port Input Bit3 */   
+        uint8_t PIN4: 1;  /* Port Input Bit4 */  
+        uint8_t PIN5: 1;  /* Port Input Bit5 */   
+        uint8_t PIN6: 1;  /* Port Input Bit6 */  
+        uint8_t PIN7: 1;  /* Port Input Bit7 */  
+    }bits;
+
+}PIN_t;
+
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t DD0: 1;  /* Port Direction Bit0 */  
+        uint8_t DD1: 1;  /* Port Direction Bit1 */   
+        uint8_t DD2: 1;  /* Port Direction Bit2 */  
+        uint8_t DD3: 1;  /* Port Direction Bit3 */   
+        uint8_t DD4: 1;  /* Port Direction Bit4 */  
+        uint8_t DD5: 1;  /* Port Direction Bit5 */   
+        uint8_t DD6: 1;  /* Port Direction Bit6 */  
+        uint8_t DD7: 1;  /* Port Direction Bit7 */  
+    }bits;
+
+}DDR_t;
+
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t PORT0: 1;  /* Port Output Bit0 */  
+        uint8_t PORT1: 1;  /* Port Output Bit1 */   
+        uint8_t PORT2: 1;  /* Port Output Bit2 */  
+        uint8_t PORT3: 1;  /* Port Output Bit3 */   
+        uint8_t PORT4: 1;  /* Port Output Bit4 */  
+        uint8_t PORT5: 1;  /* Port Output Bit5 */   
+        uint8_t PORT6: 1;  /* Port Output Bit6 */  
+        uint8_t PORT7: 1;  /* Port Output Bit7 */  
+    }bits;
+
+}PORT_t;
+
+/* GPIO Registers Structure */
+typedef struct 
+{
+    volatile PIN_t  PIN ;
+    volatile DDR_t  DDR ;
+    volatile PORT_t PORT;
+}GPIO_Reg_S;
+
+/**
+ * @brief GPIO Base Addresses.
+ */
+#define GPIO_A_BASE_ADDRESS            0x39U
+#define GPIO_B_BASE_ADDRESS            0x36U
+#define GPIO_C_BASE_ADDRESS            0x33U
+#define GPIO_D_BASE_ADDRESS            0x30U
+
+/**
+ * @brief Map GPIO Registers and their bits to their Memory locations.
+ */
+#define GPIO_A_REGS       ((GPIO_Reg_S *) GPIO_A_BASE_ADDRESS)
+#define GPIO_B_REGS       ((GPIO_Reg_S *) GPIO_B_BASE_ADDRESS)
+#define GPIO_C_REGS       ((GPIO_Reg_S *) GPIO_C_BASE_ADDRESS)
+#define GPIO_D_REGS       ((GPIO_Reg_S *) GPIO_D_BASE_ADDRESS)
 
 #endif
