@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2023-08-28 11:54:20                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2023-08-28 13:43:45                              *
+ * @LastEditDate          : 2023-08-28 14:07:48                              *
  * @FilePath              : GPIO_prog.c                                      *
  ****************************************************************************/
 
@@ -149,5 +149,58 @@ driver_status_t GPIO_set_pin_level(gpio_port_t port, gpio_pin_t pin, gpio_level_
     return GPIO_status;
 }
 
-driver_status_t GPIO_get_pin_level(gpio_port_t, gpio_pin_t, gpio_level_t *);
+/**
+ * @brief This API is used to get the value of pin.
+ * @param port The Port whose pin level will be got (PORT_A -> PORT_D).
+ * @param pin The Pin whose level will be gott (PIN_0 -> PIN_7).
+ * @param level The level of the Pin that will be got (PIN_LOW_LEVEL or PIN_HIGH_LEVEL).
+ * @example GPIO_get_pin_level(PORT_A, PIN_0, &level).
+ * @return The level of the Pin and the status of the API (DRIVER_IS_OK, PTR_USED_IS_NULL_PTR or VALUE_IS_NOT_EXISTED).
+ */
+driver_status_t GPIO_get_pin_level(gpio_port_t port, gpio_pin_t pin, gpio_level_t * level)
+{
+    driver_status_t GPIO_status = DRIVER_IS_OK;
+
+    /* Check if the Pointer is NULL pointer */
+    if(level != NULL)
+    {
+        /* Check if the Port is existed or not */
+        if(port < PORT_MAX)
+        {
+            /* Check if the Pin is existed or not */
+            if(pin == PIN_0 || pin == PIN_1 || pin == PIN_2 || pin == PIN_3 
+            || pin == PIN_4 || pin == PIN_5 || pin == PIN_6 || pin == PIN_7)
+            {
+                /* Get the Pin level */
+                *level = (((GPIO_PORTS[port]->PIN).reg) & pin);
+                /* Set level to level values */
+                if(*level != PIN_LOW_LEVEL)
+                {
+                    /* Set Pin level to PIN_HIGH_LEVEL value */
+                    *level = PIN_HIGH_LEVEL;
+                }
+                else
+                {
+                    /* Do Nothing */
+                }
+            }
+            else
+            {
+                /* The Pin level value is not existed */
+                GPIO_status = VALUE_IS_NOT_EXISTED;
+            }
+        }
+        else
+        {
+            /* The Port value is not existed */
+            GPIO_status = VALUE_IS_NOT_EXISTED;
+        }
+    }
+    else
+    {
+        /* The pointer is Null Pointer */
+        GPIO_status = PTR_USED_IS_NULL_PTR;
+    }
+}
+
 driver_status_t GPIO_tog_pin_level(gpio_port_t, gpio_pin_t);
