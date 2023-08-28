@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2023-08-28 11:54:20                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2023-08-28 14:07:48                              *
+ * @LastEditDate          : 2023-08-28 14:18:28                              *
  * @FilePath              : GPIO_prog.c                                      *
  ****************************************************************************/
 
@@ -201,6 +201,44 @@ driver_status_t GPIO_get_pin_level(gpio_port_t port, gpio_pin_t pin, gpio_level_
         /* The pointer is Null Pointer */
         GPIO_status = PTR_USED_IS_NULL_PTR;
     }
+
+    /* Return API status*/
+    return GPIO_status;
 }
 
-driver_status_t GPIO_tog_pin_level(gpio_port_t, gpio_pin_t);
+/**
+ * @brief This API is used to toggle level of Pin or Pins for same port. 
+ * @param port The Port whose Pin or Pins level will be toggled (PORT_A -> PORT_D).
+ * @param pin The Pin or Pins whose level will be toggled (PIN_0 -> PIN_7, PIN_0 | PIN_1 | ...| PIN_7 or PIN_ALL).
+ * @example GPIO_tog_pin_level(PORT_A, PIN_0).
+ * @example GPIO_tog_pin_level(PORT_B, PIN_0 | PIN_1 | PIN_3).
+ * @example GPIO_tog_pin_level(PORT_C, PIN_ALL).
+ * @return The status of the API (DRIVER_IS_OK or VALUE_IS_NOT_EXISTED).
+ */
+driver_status_t GPIO_tog_pin_level(gpio_port_t port, gpio_pin_t pin)
+{
+    driver_status_t GPIO_status = DRIVER_IS_OK;
+
+    /* Check if the port existed or not */
+    if(port < PORT_MAX)
+    {
+        if(pin <= PIN_ALL)
+        {
+            /* Toggle Pin level */
+            ((GPIO_PORTS[port]->PORT).reg) ^= pin;
+        }
+        else
+        {
+            /* The Pin value is not existed */
+            GPIO_status = VALUE_IS_NOT_EXISTED;
+        }
+    }
+    else
+    {
+        /* The Port value is not existed */
+        GPIO_status = VALUE_IS_NOT_EXISTED;
+    }
+
+    /* Return API status */
+    return GPIO_status;
+}
