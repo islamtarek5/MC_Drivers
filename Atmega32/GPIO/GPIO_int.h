@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2023-08-28 11:52:17                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2023-08-28 12:25:06                              *
+ * @LastEditDate          : 2023-08-30 17:27:04                              *
  * @FilePath              : GPIO_int.h                                       *
  ****************************************************************************/
 
@@ -66,9 +66,10 @@ typedef enum
 
 typedef enum
 {
-    PIN_FLOATING_INPUT = (uint8_t) 0,
-    PIN_PULL_UP_INPUT               ,
-    PIN_OUTPUT                      ,
+    PIN_OUTPUT = (uint8_t) 0,
+    PIN_FLOATING_INPUT      ,
+    PIN_PULL_UP_INPUT       ,
+    PIN_PULL_DOWN_INPUT     ,
     PIN_MAX_MODE
 }gpio_mode_t;
 
