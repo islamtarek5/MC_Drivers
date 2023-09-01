@@ -1,8 +1,8 @@
 /*****************************************************************************
- * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
+ * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2023-06-27 10:22:06                              *
- * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-07-02 13:31:05                              *
+ * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
+ * @LastEditDate          : 2023-08-07 22:42:33                              *
  * @FilePath              : EEPROM_int.h                                     *
  ****************************************************************************/
 
@@ -13,7 +13,7 @@
  * @section Includes
  */
 
-#include <stdint.h>
+#include "../../MC_driver.h"
 
 
 /**
