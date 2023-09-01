@@ -12,7 +12,6 @@
 
 #include "../atmega32_reg.h"
 #include "GPIO_int.h"
-#include "GPIO_priv.h"
 
 
 /**
@@ -72,9 +71,11 @@ driver_status_t GPIO_set_pin_mode (gpio_port_t port, gpio_pin_t pin, gpio_mode_t
                 ((GPIO_PORTS[port]->PORT).reg) |= pin;
                 /* Set Pin Direction to Input*/
                 ((GPIO_PORTS[port]->DDR).reg) &= ~pin;
+                break;
             case PIN_OUTPUT:
                 /* Set Pin Direction to Output */
-                ((GPIO_PORTS[port]->DDR).reg) |= pin;             
+                ((GPIO_PORTS[port]->DDR).reg) |= pin;
+                break;
             default:
                 /* Mode value is not existed */
                 GPIO_status = VALUE_IS_NOT_EXISTED; 
@@ -127,6 +128,7 @@ driver_status_t GPIO_set_pin_level(gpio_port_t port, gpio_pin_t pin, gpio_level_
             case PIN_HIGH_LEVEL:
                 /* Set Pin Level */
                 ((GPIO_PORTS[port]->PORT).reg) |= pin;           
+                break;
             default:
                 /* Level value is not existed */
                 GPIO_status = VALUE_IS_NOT_EXISTED; 
