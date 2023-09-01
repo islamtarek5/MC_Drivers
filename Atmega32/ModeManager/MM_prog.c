@@ -13,6 +13,20 @@
 #include "../atmega32_reg.h"
 #include "MM_int.h"
 
+
+/**
+ * @section Definitions
+ */
+
+/**
+ * @brief Sleep Macro
+ */
+#define sleep_cpu()                              \
+do {                                             \
+  __asm__ __volatile__ ( "sleep" "\n\t" :: );    \
+} while(0)
+
+
 /**
  * @section Implementation
  */
@@ -47,7 +61,7 @@ driver_status_t MM_set_mode(mode_t mode)
         ((MCUCR -> bits).SE) = (uint8_t)SET_VALUE;
 
         /* Run Sleep Instruction */
-        _SLEEP();
+        sleep_cpu();
 
         /* Disable Sleep Mode */
         ((MCUCR -> bits).SE) = (uint8_t)CLEAR_VALUE;

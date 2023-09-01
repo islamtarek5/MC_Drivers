@@ -34,6 +34,13 @@
 #define GLOBAL_INTERRUPT_ENABLE 1U
 
 /**
+ * @brief NULL
+ */
+
+#define NULL ((void*)0)
+
+
+/**
  * @section Typedefs
  */
 
