@@ -22,21 +22,18 @@
 /**
  * @brief Bit Values
  */
-
 #define CLEAR_VALUE 0U
 #define SET_VALUE 1U
 
 /**
  * @brief Global Interrupt
  */
-
 #define GLOBAL_INTERRUPT_DISABLE 0U
 #define GLOBAL_INTERRUPT_ENABLE 1U
 
 /**
  * @brief NULL
  */
-
 #define NULL ((void*)0)
 
 
@@ -47,7 +44,6 @@
 /**
  * @brief Driver Errors
  */
-
 typedef enum
 {
     DRIVER_IS_OK = (uint8_t)0,
