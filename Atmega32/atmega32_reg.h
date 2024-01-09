@@ -1,8 +1,8 @@
 /*****************************************************************************
- * @Author                : Islam Tarek<islamtarek0550@gmail.com>            *
+ * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2023-06-25 12:55:48                              *
- * @LastEditors           : Islam Tarek<islamtarek0550@gmail.com>            *
- * @LastEditDate          : 2023-08-28 11:23:53                              *
+ * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
+ * @LastEditDate          : 2024-01-09 16:20:20                              *
  * @FilePath              : atmega32_reg.h                                   *
  ****************************************************************************/
 
@@ -320,7 +320,7 @@ typedef union
     uint8_t reg;
     struct 
     {
-        uint8_t PSR10    : 1;    //TODO 
+        uint8_t PSR10    : 1;    /* Prescaler Reset Timer/Counter1 and Timer/Counter0 */
         uint8_t PSR2     : 1;    //TODO 
         uint8_t PUD      : 1;    /* Pull-up disable */
         uint8_t ACME     : 1;    //TODO 
@@ -344,7 +344,7 @@ typedef union
 
 
 /**
- * @brief GPIO Registers and their pins.
+ * @brief GPIO Registers and their bits.
  * @note Port Input Pins Register (PIN) and its bits. (Read only Register)
  * @note PIN contains the input value of the MCU pins.
  * @note PIN initial Value is unknown (N/A, floating value).
@@ -430,5 +430,191 @@ typedef struct
 #define GPIO_B_REGS       ((GPIO_Reg_S *) GPIO_B_BASE_ADDRESS)
 #define GPIO_C_REGS       ((GPIO_Reg_S *) GPIO_C_BASE_ADDRESS)
 #define GPIO_D_REGS       ((GPIO_Reg_S *) GPIO_D_BASE_ADDRESS)
+
+/**
+ * @brief Timer Registers and Their bits.
+ * @note Timer/Counter Control Register (TCCRn) and its bits. (R/W Register except Force output compare bit (FOCn))
+ * @note TCCRn is used to control Waveform generation mode, control compare match output mode and to select prescaler.
+ * @note Timer/Counter Register (TCNTn) and its bits. (R/W Register)
+ * @note Writing to TCNTn Register will block compare match on the following timer clock.
+ * @note Out Compare Register (OCRn) and its bits. (R/W Register)
+ * @note OCRn contains the value which is continously compared with the TCNTn value and matching can be used to generate interrupt or generate waveform output on OCn pin.
+ * @note Timer/Counter Interrupt Mask Registe (TIMSK) and its bits. (R/W Register)
+ * @note TIMSK is used to enable/disable Timer Interrupts.
+ * @note Timer/Counter Interrupt Flag Register (TIFR) and its bits. (R/W Register)
+ * @note TIFR contains Timer Flags which are set when their relative envents occured, flags are cleared when interrupts are handled or by writing 1 in flag bit.
+ * @note Timer Registers initial values are 0x00.
+ */
+
+/**
+ * @section Shared Registers between all timers.
+*/
+
+/**
+ * @brief TIMSK Register and its bits.
+*/
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t TOIE0 : 1; /*       Timer/Counter0 Overflow Interrupt Enable       */
+        uint8_t OCIE0 : 1; /* Timer/Counter0 Output Compaere Match Inerrupt Enable */
+        uint8_t TOIE1 : 1; /*       Timer/Counter1 Overflow Interrupt Enable       */
+        uint8_t OCIE1B: 1; 
+        uint8_t OCIE1A: 1; 
+        uint8_t TICIE1: 1;
+        uint8_t TOIE2 : 1; /*       Timer/Counter2 Overflow Interrupt Enable       */
+        uint8_t OCIE2 : 1; /* Timer/Counter2 Output Compaere Match Inerrupt Enable */
+    }bits;
+
+}TIMSK_t;
+
+/**
+ * @brief TIFR Register and its bits.
+*/
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t TOV0 : 1; /* Timer/Counter0 Overflow Flag */
+        uint8_t OCF0 : 1; /*    Output Compare Flag 0     */
+        uint8_t TOV1 : 1; /* Timer/Counter1 Overflow Flag */
+        uint8_t OCF1B: 1;
+        uint8_t OCF1A: 1;
+        uint8_t ICF1 : 1;
+        uint8_t TOV2 : 1; /* Timer/Counter2 Overflow Flag */
+        uint8_t OCF2 : 1; /*    Output Compare Flag 2     */
+    }bits;
+    
+}TIFR_t;
+
+/**
+ * @section Same Bits'Locations Registers.
+*/
+
+/**
+ * @brief TCNT Register and its bits.
+ */
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t TCNT0: 1; /* Timer/ Counter bit 0 */
+        uint8_t TCNT1: 1; /* Timer/ Counter bit 1 */
+        uint8_t TCNT2: 1; /* Timer/ Counter bit 2 */
+        uint8_t TCNT3: 1; /* Timer/ Counter bit 3 */
+        uint8_t TCNT4: 1; /* Timer/ Counter bit 4 */
+        uint8_t TCNT5: 1; /* Timer/ Counter bit 5 */
+        uint8_t TCNT6: 1; /* Timer/ Counter bit 6 */
+        uint8_t TCNT7: 1; /* Timer/ Counter bit 7 */
+    }bits;  
+
+}TCNT_t;
+
+/**
+ * @brief OCR Register and its bits.
+ */
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t OCR0: 1; /* Output Compare bit 0 */
+        uint8_t OCR1: 1; /* Output Compare bit 1 */
+        uint8_t OCR2: 1; /* Output Compare bit 2 */
+        uint8_t OCR3: 1; /* Output Compare bit 3 */
+        uint8_t OCR4: 1; /* Output Compare bit 4 */
+        uint8_t OCR5: 1; /* Output Compare bit 5 */
+        uint8_t OCR6: 1; /* Output Compare bit 6 */
+        uint8_t OCR7: 1; /* Output Compare bit 7 */
+    }bits;
+    
+}OCR_t;
+
+/**
+ * @section Different Bits'Locations Registers. 
+ * 
+ */
+
+/**
+ * @brief TCCR Register and its bits. (Timer 0 and Timer 2)
+ */
+typedef union 
+{
+    uint8_t reg;
+    struct 
+    {
+        uint8_t CS0 : 1; /*       Clock Select bit 0        */
+        uint8_t CS1 : 1; /*       Clock Select bit 1        */
+        uint8_t CS2 : 1; /*       Clock Select bit 2        */
+        uint8_t WGM1: 1; /* Waveform Generation Mode bit 1  */
+        uint8_t COM0: 1; /* Compare Match output Mode bit 0 */
+        uint8_t COM1: 1; /* Compare Match output Mode bit 1 */
+        uint8_t WGM0: 1; /* Waveform Generation Mode bit 0  */
+        uint8_t FOC : 1; /*    Force Output Compare bit     */
+    }bits;
+
+}TCCR_t;
+
+/**
+ * @section Registers'Addresses.
+ */
+
+/**
+ * @brief TIMSK Address.
+ */
+#define TIMSK_ADDRESS                   0x59U
+
+/**
+ * @brief TIFR Address.
+ */
+#define TIFR_ADDRESS                    0x58U
+
+/**
+ * @brief TCNT Address.
+ */
+#define TCNT0_ADDRESS                   0x52U
+
+/**
+ * @brief OCR Addresses.
+ */
+#define OCR0_ADDRESS                    0x5CU
+
+/**
+ * @brief TCCR Address.
+ */
+#define TCCR0_ADDRESS                   0x53U
+
+/**
+ * @section Mapping of Registers and their bits to their locations in memory.
+ */
+
+/**
+ * @brief Map TIMSK Register and its bits to their location in memory.
+ */
+#define TIMSK       ((volatile TIMSK_t *) TIMSK_ADDRESS)
+
+/**
+ * @brief Map TIFR Register and its bits to their location in memory.
+ */
+#define TIFR        ((volatile TIFR_t *) TIFR_ADDRESS)
+
+/**
+ * @brief Map TCNT0 Register and its bits to their location in memory.
+ */
+#define TCNT0       ((volatile TCNT_t *) TCNT0_ADDRESS)
+
+/**
+ * @brief Map OCR0 Register and its bits to their location in memory.
+ */
+#define OCR0        ((volatile OCR_t *) OCR0_ADDRESS)
+
+/**
+ * @brief Map TCCR0 Register and its bits to their location in memory.
+ */
+#define TCCR0       ((volatile TCCR_t *) TCCR0_ADDRESS)
 
 #endif
