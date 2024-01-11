@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2024-01-09 17:07:46                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2024-01-11 11:46:04                              *
+ * @LastEditDate          : 2024-01-11 14:37:51                              *
  * @FilePath              : timer_int.h                                      *
  ****************************************************************************/
 
@@ -85,10 +85,11 @@ typedef enum
  */
 typedef enum
 {
-    TIMER_DISABLE_ALL_INTERRUPTS = (uint8_t)0,
-    TIMER_ENABLE_OVERFLOW_INERRUPT,
-    TIMER_ENABLE_COMPARE_MATCH_INTERRUPT,
-    TIMER_ENABLE_ALL_INTERRUPTS,
+    TIMER_DISABLE_ALL_INTERRUPTS = (uint8_t)0,  /* Disable All Interrupts (Used with all Timers) */
+    TIMER_ENABLE_OVF_INERRUPT,                  /* Enable Overflow Interrupt only (Used with all Timers) */
+    TIMER_ENABLE_CM_INTERRUPT,                  /* ُEnable Compare Match Interrupt only (Used with all Timers) */
+    TIMER_ENABLE_BOTH_OVF_AND_CM_INTERRUPTS,    /* Enable Both Overflow and compare match Interrupts (Used with all Timers) */
+    TIMER_ENABLE_ALL_INTERRUPTS,                /* Enable All Interrupts (Used with Timer1 only)*/
     TIMER_MAX_INTERRRUPT_STATE
 } timer_interrupt_status_t;
 
