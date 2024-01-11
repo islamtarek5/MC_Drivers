@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2023-06-27 10:24:09                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2023-08-07 23:42:17                              *
+ * @LastEditDate          : 2024-01-11 09:41:29                              *
  * @FilePath              : EEPROM_prog.c                                    *
  ****************************************************************************/
 
@@ -129,8 +129,8 @@ driver_status_t EEPROM_write_data(uint16_t base_address, uint8_t *data, uint16_t
     driver_status_t EEPROM_status = DRIVER_IS_OK;
     static uint16_t next_location = EEPROM_NO_ADDRESS;
 
-    /* Check if the pointers are null */
-    if ((data == NULL) || (actual_length == NULL))
+    /* Check if the pointers are null pointers */
+    if ((data == NULL_PTR) || (actual_length == NULL_PTR))
     {
         /* Set EEPROM status to NULL Pointer */
         EEPROM_status = PTR_USED_IS_NULL_PTR;
@@ -214,8 +214,8 @@ driver_status_t EEPROM_read_data(uint16_t base_address, uint8_t *data, uint16_t 
     driver_status_t EEPROM_status = DRIVER_IS_OK;
     static uint16_t next_location = EEPROM_NO_ADDRESS;
 
-    /* Check if the pointers are null */
-    if ((data == NULL) || (actual_length == NULL))
+    /* Check if the pointers are null Pointers */
+    if ((data == NULL_PTR) || (actual_length == NULL_PTR))
     {
         /* Set EEPROM status to NULL Pointer */
         EEPROM_status = PTR_USED_IS_NULL_PTR;

@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2023-08-28 11:54:20                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2023-08-28 14:18:28                              *
+ * @LastEditDate          : 2024-01-11 09:41:44                              *
  * @FilePath              : GPIO_prog.c                                      *
  ****************************************************************************/
 
@@ -164,7 +164,7 @@ driver_status_t GPIO_get_pin_level(gpio_port_t port, gpio_pin_t pin, gpio_level_
     driver_status_t GPIO_status = DRIVER_IS_OK;
 
     /* Check if the Pointer is NULL pointer */
-    if(level != NULL)
+    if(level != NULL_PTR)
     {
         /* Check if the Port is existed or not */
         if(port < PORT_MAX)
