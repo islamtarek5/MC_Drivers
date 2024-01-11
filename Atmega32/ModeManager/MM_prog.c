@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2023-08-07 22:37:53                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2023-08-08 00:20:00                              *
+ * @LastEditDate          : 2024-01-11 09:42:35                              *
  * @FilePath              : MM_prog.c                                        *
  ****************************************************************************/
 
@@ -82,8 +82,8 @@ driver_status_t MM_get_mode(mode_t * mode)
 {
     driver_status_t MM_status = DRIVER_IS_OK;
 
-    /* Check if the pointer is null */
-    if(mode == NULL)
+    /* Check if the pointer is null Pointer */
+    if(mode == NULL_PTR)
     {
         MM_status = PTR_USED_IS_NULL_PTR;
     }
