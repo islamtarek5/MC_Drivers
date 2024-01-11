@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2024-01-09 17:07:46                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2024-01-10 16:30:13                              *
+ * @LastEditDate          : 2024-01-11 11:46:04                              *
  * @FilePath              : timer_int.h                                      *
  ****************************************************************************/
 
@@ -69,12 +69,12 @@ typedef enum
  */
 typedef enum
 {
-    TIMER_NOT_USED_PIN = (uint8_t)0, /* The Timer Pin is used as GPIO Pin (Used with all Modes and must be used with Normal mode) */
+    TIMER_PIN_NOT_USED = (uint8_t)0, /* The Timer Pin is used as GPIO Pin (Used with all Modes and must be used with Normal mode) */
     TIMER_TOGGLE_PIN,                /* The Timer Pin will bed toggled when compare match occurs (Used with Compare Match Mode only) */
     TIMER_CLEAR_PIN,                 /* The Timer Pin will be cleared when compare match occurs (Used with Compare Match Mode only) */
     TIMER_SET_PIN,                   /* The Timer Pin will be set when compare match occurs(Used with Compare Match Mode only) */
-    TIMER_NON_INVERTING_OUTPUT,      /* The Time will generate Non_Inverting PWM on its pin (Used with PWM Mode only) */
     TIMER_RESERVED_PIN_FUNC_VALUE,   /* Reserved Value in case of PWM Mode only */
+    TIMER_NON_INVERTING_OUTPUT,      /* The Time will generate Non_Inverting PWM on its pin (Used with PWM Mode only) */
     TIMER_INVERTING_OUTPUT,          /* The Time will generate Inverting PWM on its pin (Used with PWM Mode only) */
     TIMER_MAX_PIN_FUNC
 } timer_Pin_func_t;
@@ -85,8 +85,10 @@ typedef enum
  */
 typedef enum
 {
-    TIMER_DISABLE_INTERRUPT = (uint8_t)0,
-    TIMER_ENABLE_INTERRUPT,
+    TIMER_DISABLE_ALL_INTERRUPTS = (uint8_t)0,
+    TIMER_ENABLE_OVERFLOW_INERRUPT,
+    TIMER_ENABLE_COMPARE_MATCH_INTERRUPT,
+    TIMER_ENABLE_ALL_INTERRUPTS,
     TIMER_MAX_INTERRRUPT_STATE
 } timer_interrupt_status_t;
 
@@ -104,8 +106,6 @@ typedef struct
     timer_mode_t mode;
     timer_Pin_func_t pinFunc;
     timer_tech_t tech;
-    timer_interrupt_status_t interruptStatus;
-    timer_P2VCbFunc_t callback;
 } timer_cfg_S;
 
 /**
@@ -113,9 +113,6 @@ typedef struct
  */
 
 driver_status_t timer_init(timer_cfg_S *);
-driver_status_t timer_set_mode(timer_id_t, timer_mode_t);
-driver_status_t timer_set_pin_function(timer_id_t, timer_Pin_func_t);
-driver_status_t timer_set_tech(timer_id_t, timer_tech_t);
 driver_status_t timer_set_inerrupt_status(timer_id_t, timer_interrupt_status_t);
 driver_status_t timer_set_callback_function(timer_id_t, timer_P2VCbFunc_t);
 driver_status_t timer_set_period_us(timer_id_t, uint16_t);
