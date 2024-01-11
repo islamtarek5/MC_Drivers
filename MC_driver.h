@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2023-06-27 12:07:12                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2023-08-08 00:22:32                              *
+ * @LastEditDate          : 2024-01-11 09:41:32                              *
  * @FilePath              : MC_driver.h                                      *
  ****************************************************************************/
 
@@ -23,19 +23,35 @@
  * @brief Bit Values
  */
 #define CLEAR_VALUE 0U
-#define SET_VALUE 1U
+#define SET_VALUE   1U
 
 /**
  * @brief Global Interrupt
  */
 #define GLOBAL_INTERRUPT_DISABLE 0U
-#define GLOBAL_INTERRUPT_ENABLE 1U
+#define GLOBAL_INTERRUPT_ENABLE  1U
 
 /**
- * @brief NULL
+ * @brief NULL Pointer
  */
-#define NULL ((void*)0)
+#define NULL_PTR ((void*)0)
 
+/**
+ * @brief Bits Manipulation. 
+ */
+#define GET_BIT(var, bit)  (((var) >> bit) & SET_VALUE)
+
+/**
+ * @brief Bits Positions.
+*/
+#define BIT0        0U
+#define BIT1        1U
+#define BIT2        2U
+#define BIT3        3U
+#define BIT4        4U
+#define BIT5        5U
+#define BIT6        6U
+#define BIT7        7U
 
 /**
  * @section Typedefs
@@ -49,6 +65,9 @@ typedef enum
     DRIVER_IS_OK = (uint8_t)0,
     VALUE_IS_NOT_EXISTED,
     PTR_USED_IS_NULL_PTR,
+    VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER,
+    VALUE_IS_NOT_COMPATIBLE_WITH_OTHER_CONFIGURATIONS,
+    VALUE_IS_RESERVED,
 
     /* EEPROM Status */
     EEPROM_ADDRESS_NOT_AVAILABLE,
