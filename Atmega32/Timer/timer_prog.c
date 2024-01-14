@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2024-01-09 17:07:55                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2024-01-11 13:55:29                              *
+ * @LastEditDate          : 2024-01-14 09:23:33                              *
  * @FilePath              : timer_prog.c                                     *
  ****************************************************************************/
 
@@ -160,7 +160,7 @@ driver_status_t timer_init(timer_cfg_S *timer_config)
  * @brief This API is used to set the Interrupt Status (Enable, Disable).
  * @param ID is the ID of the Timer whose Interrupt status will be set.
  * @param INT_status is the Interrupt Status which will be used (TIMER_DISABLE_ALL_INTERRUPTS, TIMER_ENABLE_OVERFLOW_INERRUPT, TIMER_ENABLE_COMPARE_MATCH_INTERRUPT, TIMER_ENABLE_ALL_INTERRUPTS).
- * @return The Status of API (DRIVER_IS_OK).
+ * @return The Status of API (DRIVER_IS_OK, VALUE_IS_NOT_COMPATIBLE_WITH_OTHER_CONFIGURATIONS, VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER, VALUE_IS_NOT_EXISTED).
  */
 driver_status_t timer_set_inerrupt_status(timer_id_t ID, timer_interrupt_status_t INT_status)
 {
@@ -214,6 +214,9 @@ driver_status_t timer_set_inerrupt_status(timer_id_t ID, timer_interrupt_status_
         /* Timer ID isn't Existing */
         timer_status = VALUE_IS_NOT_EXISTED;
     }
+
+    /* Return Timer Status Value */
+    return timer_status;
 }
 
 driver_status_t timer_set_callback_function(timer_id_t, timer_P2VCbFunc_t);
