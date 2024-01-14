@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2024-01-09 17:07:46                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2024-01-11 14:37:51                              *
+ * @LastEditDate          : 2024-01-14 11:11:56                              *
  * @FilePath              : timer_int.h                                      *
  ****************************************************************************/
 
@@ -94,6 +94,17 @@ typedef enum
 } timer_interrupt_status_t;
 
 /**
+ * @brief Timer Callback Types
+ * 
+ */
+typedef enum
+{
+    TIMER_OVF_CB = (uint8_t)0,
+    TIMER_CM_CB,
+    TIMER_MAX_CB
+}timer_cb_t;
+
+/**
  * @brief Callback function.
  */
 typedef void (*timer_P2VCbFunc_t)(void);
@@ -115,7 +126,7 @@ typedef struct
 
 driver_status_t timer_init(timer_cfg_S *);
 driver_status_t timer_set_inerrupt_status(timer_id_t, timer_interrupt_status_t);
-driver_status_t timer_set_callback_function(timer_id_t, timer_P2VCbFunc_t);
+driver_status_t timer_set_callback_function(timer_id_t, timer_cb_t, timer_P2VCbFunc_t);
 driver_status_t timer_set_period_us(timer_id_t, uint16_t);
 driver_status_t timer_set_pwm_info(timer_id_t, uint8_t, uint8_t);
 driver_status_t timer_start(timer_id_t);

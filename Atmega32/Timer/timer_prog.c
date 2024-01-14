@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2024-01-09 17:07:55                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2024-01-14 11:28:38                              *
+ * @LastEditDate          : 2024-01-14 11:34:09                              *
  * @FilePath              : timer_prog.c                                     *
  ****************************************************************************/
 
@@ -36,8 +36,8 @@ typedef struct
 /**
  * @brief Callback pointers to functions.
  */
-timer_P2VCbFunc_t TIMER0_OVF_CB = NULL_PTR;
-timer_P2VCbFunc_t TIMER0_CM_CB = NULL_PTR;
+static timer_P2VCbFunc_t TIMER_OVF_CB_ARR[TIMER_MAX_ID] = {NULL_PTR, NULL_PTR, NULL_PTR};
+static timer_P2VCbFunc_t TIMER_CM_CB_ARR[TIMER_MAX_ID] = {NULL_PTR, NULL_PTR, NULL_PTR};
 
 /**
  * @brief Timers'Configurations Array.
@@ -240,6 +240,55 @@ driver_status_t timer_set_inerrupt_status(timer_id_t ID, timer_interrupt_status_
     return timer_status;
 }
 
-driver_status_t timer_set_callback_function(timer_id_t, timer_P2VCbFunc_t);
+/**
+ * @brief This API is used to set Callback function.
+ * @param ID is the ID of Timer whose callback function will be set. 
+ * @param cb_type is the Type of callback function (TIMER_OVF_CB, TIMER_CM_CB).
+ * @param P2callback is function pointer to callback function.
+ * @return The status of the driver (DRIVER_IS_OK, PTR_USED_IS_NULL_PTR or VALUE_IS_NOT_EXISTED)
+ */
+driver_status_t timer_set_callback_function(timer_id_t ID, timer_cb_t cb_type, timer_P2VCbFunc_t P2callback)
+{
+    driver_status_t timer_status = DRIVER_IS_OK;
+
+    /* Check if Timer ID is existing or not */
+    if (ID < TIMER_MAX_ID)
+    {
+        /* Check if the Pointer to callback function is null pointer */
+        if (P2callback != NULL_PTR)
+        {
+            /* Check if the Callback is OverFlow callback */
+            if (cb_type == TIMER_OVF_CB)
+            {
+                /* Set OVF Callback function */
+                TIMER_OVF_CB_ARR[ID] = P2callback;
+            }
+            /* Check if the Callback is compare match callback */
+            else if (cb_type == TIMER_CM_CB)
+            {
+                /* Set CM Callback function */
+                TIMER_CM_CB_ARR[ID] = P2callback;
+            }
+            else
+            {
+                // TODO: This Section will be added with Timer1 Implementation
+            }
+        }
+        else
+        {
+            /* Callback Function Pointer is NULL Pointer */
+            timer_status = PTR_USED_IS_NULL_PTR;
+        }
+    }
+    else
+    {
+        /* Timer ID isn't existing */
+        timer_status = VALUE_IS_NOT_EXISTED;
+    }
+
+    /* Return Timer Status Value */
+    return timer_status;
+}
+
 driver_status_t timer_start(timer_id_t);
 driver_status_t timer_stop(timer_id_t);
