@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2024-01-09 17:07:55                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2024-01-18 12:43:49                              *
+ * @LastEditDate          : 2024-01-18 12:53:01                              *
  * @FilePath              : timer_prog.c                                     *
  ****************************************************************************/
 
@@ -93,6 +93,7 @@ static timer_info_S TIMER_INFO_ARR[TIMER_MAX_ID] =
  */
 
 static void timer_calculations(timer_id_t);
+static driver_status_t timer_busy_wait(timer_id_t);
 
 /**
  * @section APIs Implementation.
@@ -360,6 +361,183 @@ static void timer_calculations(timer_id_t ID)
     
     /* Calculate and update the number of required overflows */
     TIMER_REQUIRED_OVFs[ID] += (TIMER_COUNTs[ID] / TIMER_MAX_COUNT_VALUE[ID]);
+}
+
+/**
+ * @brief This Static API is used to apply busy wait until the required time is elapsed.
+ * @param ID The ID of timer that will be used.
+ * @return The status of the Driver (DRIVER_IS_OK or VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER).
+ */
+static driver_status_t timer_busy_wait(timer_id_t ID)
+{
+    driver_status_t timer_status = DRIVER_IS_OK;
+    uint8_t current_ovf_number = TIMER_WITH_ZERO_OVFS;
+
+    /* Calculate Initial Value and number of OVFs*/
+    timer_calculations(ID);    
+
+/* Check which Busy Wait method is used */
+#if (TIMER_BUSY_WAIT_METHOD == TIMER_BUSY_WAIT_0)
+    /* Check if mode used is normal mode */
+    if (TIMER_INFO_ARR[ID].timer_cfg.mode == TIMER_NORMAL_MODE)
+    {
+        /* Check which timer is used */
+        if (ID == TIMER_0)
+        {
+            /* Wait until the time is elapsed */
+            while (current_ovf_number < TIMER_REQUIRED_OVFs[ID])
+            {
+                /* Check if the cycle is first cycle or not */
+                if (current_ovf_number == TIMER_WITH_ZERO_OVFS)
+                {
+                    /* Set Counter Initial value */
+                    TCNT0->reg = TIMER_INITIAL_VALUE[ID];
+                }
+                else
+                {
+                    /* Do Nothing */
+                }
+                /* Check if the flag is raised or not */
+                if (TIFR->bits.TOV0 == TIMER_FLAG_IS_RAISED)
+                {
+                    /* Clear timer Flag */
+                    TIFR->bits.TOV0 = TIMER_CLEAR_FLAG;
+                    /* Increment Number of current overflows */
+                    current_ovf_number++;
+                }
+                else
+                {
+                    /* Do Nothing */
+                }
+            }
+        }
+        else if (ID == TIMER_1)
+        {
+            // TODO: This section will be added with Timer 1 Implementation.
+        }
+        else
+        {
+            // TODO: This section will be added with Timer 2 Implementation.
+        }
+    }
+    /* Check if mode used is compare match mode and initial value will be compared */
+    else if ((TIMER_INFO_ARR[ID].timer_cfg.mode == TIMER_COMPARE_MATCH_MODE) && (TIMER_INITIAL_VALUE[ID] != TIMER_MAX_COUNT_VALUE[ID]))
+    {
+        /* Check which timer is used */
+        if (ID == TIMER_0)
+        {
+            /* Set Timer compare match value to Maximum value */
+            OCR0->reg = TIMER_0_MAX_COUNT_VALUE;
+            /* Wait until the time is elapsed */
+            while (current_ovf_number < TIMER_REQUIRED_OVFs[ID])
+            {
+                /* Check if the cycle is first cycle or not */
+                if (current_ovf_number == TIMER_WITH_ZERO_OVFS)
+                {
+                    /* Set Counter Initial value */
+                    TCNT0->reg = TIMER_INITIAL_VALUE[ID];
+                }
+                else
+                {
+                    /* Do Nothing */
+                }
+                /* Check if the flag is raised or not */
+                if (TIFR->bits.OCF0 == TIMER_FLAG_IS_RAISED)
+                {
+                    /* Clear timer Flag */
+                    TIFR->bits.OCF0 = TIMER_CLEAR_FLAG;
+                    /* Increment Number of current overflows */
+                    current_ovf_number++;
+                }
+                else
+                {
+                    /* Do Nothing */
+                }
+            }
+        }
+        else if (ID == TIMER_1)
+        {
+            // TODO: This section will be added with Timer 1 Implementation.
+        }
+        else
+        {
+            // TODO: This section will be added with Timer 2 Implementation.
+        }
+    }
+#elif (TIMER_BUSY_WAIT_METHOD == TIMER_BUSY_WAIT_1)
+    /* Check if mode used is acceptable or not */
+    if ((TIMER_INFO_ARR[ID].timer_cfg.mode == TIMER_NORMAL_MODE) || (TIMER_INFO_ARR[ID].timer_cfg.mode == TIMER_COMPARE_MATCH_MODE) && (timer_initial_value != TIMER_MAX_COUNT_VALUE[ID]))
+    {
+        /* Wait until the time is elapsed */
+        while (current_ovf_number < TIMER_REQUIRED_OVFs[ID])
+        {
+            /* Check which timer is used */
+            if (ID == TIMER_0)
+            {
+                /* Check if the cycle is first cycle or not */
+                if (current_ovf_number == TIMER_WITH_ZERO_OVFS)
+                {
+                    /* Set Counter Initial value */
+                    TCNT0->reg = TIMER_INITIAL_VALUE[ID];
+                }
+                else
+                {
+                    /* Do Nothing */
+                }
+                if (TIMER_INFO_ARR[ID].timer_cfg.mode == TIMER_COMPARE_MATCH_MODE)
+                {
+                    /* Set Timer compare match value to Maximum value */
+                    OCR0->reg = TIMER_0_MAX_COUNT_VALUE;
+                    /* Check if the Compare match flag is raised or not */
+                    if (TIFR->bits.OCF0 == TIMER_FLAG_IS_RAISED)
+                    {
+                        /* Clear timer Flag */
+                        TIFR->bits.OCF0 = TIMER_CLEAR_FLAG;
+                        /* Increment Number of current overflows */
+                        current_ovf_number++;
+                    }
+                    else
+                    {
+                        /* Do Nothing */
+                    }
+                }
+                else
+                {
+                    /* Check if the flag is raised or not */
+                    if (TIFR->bits.TOV0 == TIMER_FLAG_IS_RAISED)
+                    {
+                        /* Clear timer Flag */
+                        TIFR->bits.TOV0 = TIMER_CLEAR_FLAG;
+                        /* Increment Number of current overflows */
+                        current_ovf_number++;
+                    }
+                    else
+                    {
+                        /* Do Nothing */
+                    }
+                }
+            }
+            else if (ID == TIMER_1)
+            {
+                // TODO: This section will be added with Timer 1 Implementation.
+            }
+            else
+            {
+                // TODO: This section will be added with Timer 2 Implementation.
+            }
+        }
+    }
+#else
+    /* Do Nothing */
+#endif
+    else
+    {
+        /* Input is not acceptable (Wrong mode or initial value will cause wrong period )*/
+        timer_status = VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER;
+    }
+
+    /* Return Timer Status */
+    return timer_status;
 }
 
 driver_status_t timer_start(timer_id_t);
