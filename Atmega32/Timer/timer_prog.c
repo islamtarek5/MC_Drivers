@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2024-01-09 17:07:55                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2024-01-18 12:53:01                              *
+ * @LastEditDate          : 2024-01-18 13:04:24                              *
  * @FilePath              : timer_prog.c                                     *
  ****************************************************************************/
 
@@ -537,6 +537,62 @@ static driver_status_t timer_busy_wait(timer_id_t ID)
     }
 
     /* Return Timer Status */
+    return timer_status;
+}
+
+/**
+ * @brief This API is used to set the required period in micro-seconds (us).
+ * @param ID The ID of used Timer.
+ * @param period_us The Period in micro-seconds.
+ * @return The status of the driver (DRIVER_IS_OK, VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER or VALUE_IS_NOT_EXISTED).
+ * @note The equation that's used to update time is period = N * (prescaler / CPU clock).
+ * Where N is the number of counts, Period is the required period and prescaler & CPU Clock must be configured in Timer_cfg file.
+ */
+driver_status_t timer_set_period_us(timer_id_t ID, uint16_t period_us)
+{
+    driver_status_t timer_status = DRIVER_IS_OK;
+
+    /* Check if the Timer ID is existing or not */
+    if (ID < TIMER_MAX_ID)
+    {
+/* Check that CPU_CLK Value is accepted or not */
+#if (CPU_CLK_MHZ <= MAX_ACCEPTABLE_CPU_CLK)
+/* Check if the prescaler value is existing */
+#if ((TIMER_PRESCALER_VALUE >= TIMER_WITH_NO_PRESCALING) && (TIMER_PRESCALER_VALUE <= TIMER_WITH_EXT_CLK_RISING_EDGE))
+        /* Calculate Number of OVFs that's needed to achieve the chosen period */
+        TIMER_COUNTs[ID] = ((uint32_t)period_us * (uint32_t)CPU_CLK_MHZ) / (uint32_t)TIMER_PRESCALER_VALUE;
+        /* Check which Technique is used */
+        if(TIMER_INFO_ARR[ID].timer_cfg.tech == TIMER_BUSY_WAIT_TECH)
+        {
+            /* Call Busy wait function */
+            timer_status = timer_busy_wait(ID);
+        
+        }
+        else if(TIMER_INFO_ARR[ID].timer_cfg.tech == TIMER_INTERRUPT_TECH)
+        {
+            /* Do Nothing as it's already set by timer_set_interrupt_status API */
+        }
+        else
+        {
+            /* Timer technique isn't existing */
+            timer_status = VALUE_IS_NOT_EXISTED;
+        }
+#else
+        /* Presacler Value is not existing */
+        timer_status = VALUE_IS_NOT_EXISTED;
+#endif
+#else
+        /* CPU Clock value is not accepted */
+        timer_status = VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER;
+#endif
+    }
+    else
+    {
+        /* Timer ID is not existing */
+        timer_status = VALUE_IS_NOT_EXISTED;
+    }
+
+    /* Return the value of Timer status */
     return timer_status;
 }
 
