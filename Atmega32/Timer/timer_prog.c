@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2024-01-09 17:07:55                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2024-01-14 11:34:09                              *
+ * @LastEditDate          : 2024-01-18 12:43:49                              *
  * @FilePath              : timer_prog.c                                     *
  ****************************************************************************/
 
@@ -15,6 +15,22 @@
 #include "timer_priv.h"
 #include "Timer_cfg.h"
 #include "../GPIO/GPIO_int.h"
+
+/**
+ * @section Macros.
+ */
+
+/**
+ * @brief Values For Busy Wait Code style.
+ */
+#define TIMER_BUSY_WAIT_0 0U
+#define TIMER_BUSY_WAIT_1 1U
+
+/**
+ * @brief
+ * Configuration for Busy Wait Code Style.
+ */
+#define TIMER_BUSY_WAIT_METHOD TIMER_BUSY_WAIT_0
 
 /**
  * @section Private Data types.
@@ -40,14 +56,43 @@ static timer_P2VCbFunc_t TIMER_OVF_CB_ARR[TIMER_MAX_ID] = {NULL_PTR, NULL_PTR, N
 static timer_P2VCbFunc_t TIMER_CM_CB_ARR[TIMER_MAX_ID] = {NULL_PTR, NULL_PTR, NULL_PTR};
 
 /**
+ * @brief Number of OVFs.
+ */
+static uint32_t TIMER_COUNTs[TIMER_MAX_ID];
+
+/**
+ * @brief Timer initial Value
+ */
+static uint16_t TIMER_INITIAL_VALUE[TIMER_MAX_ID];
+
+/**
+ * @brief Timer Number of required OVFs.
+ */
+static uint8_t TIMER_REQUIRED_OVFs[TIMER_MAX_ID];
+
+/**
+ * @brief Maximum Timer Counts.
+ */
+static const uint16_t TIMER_MAX_COUNT_VALUE[TIMER_MAX_ID] =
+    {
+        TIMER_0_MAX_COUNT_VALUE,
+        TIMER_1_MAX_COUNT_VALUE,
+        TIMER_2_MAX_COUNT_VALUE};
+
+/**
  * @brief Timers'Configurations Array.
  */
-
 static timer_info_S TIMER_INFO_ARR[TIMER_MAX_ID] =
     {
         {{TIMER_MAX_ID, TIMER_MAX_MODE, TIMER_MAX_PIN_FUNC, TIMER_MAX_TECH}, TIMER_MAX_INTERRRUPT_STATE},
         {{TIMER_MAX_ID, TIMER_MAX_MODE, TIMER_MAX_PIN_FUNC, TIMER_MAX_TECH}, TIMER_MAX_INTERRRUPT_STATE},
         {{TIMER_MAX_ID, TIMER_MAX_MODE, TIMER_MAX_PIN_FUNC, TIMER_MAX_TECH}, TIMER_MAX_INTERRRUPT_STATE}};
+
+/**
+ * @section Static Functions Prototypes
+ */
+
+static void timer_calculations(timer_id_t);
 
 /**
  * @section APIs Implementation.
@@ -288,6 +333,33 @@ driver_status_t timer_set_callback_function(timer_id_t ID, timer_cb_t cb_type, t
 
     /* Return Timer Status Value */
     return timer_status;
+}
+
+/**
+ * @brief This Static API is used to calculate number of overflows and Timer Initial value.
+ * @param ID The ID of used Timer.
+ */
+static void timer_calculations(timer_id_t ID)
+{
+    uint16_t timer_required_counts[TIMER_MAX_ID];
+
+    /* Check if there is a required initial value or not */
+    if (timer_required_counts[ID] != TIMER_WITH_ZERO_COUNTS)
+    {
+        /* Calculate the number of required counts */
+        timer_required_counts[ID] = TIMER_COUNTs[ID] % TIMER_MAX_COUNT_VALUE[ID];
+        /* Calculate the initial value */
+        TIMER_INITIAL_VALUE[ID] = TIMER_MAX_COUNT_VALUE[ID] - timer_required_counts[ID];
+        /* Update the number of required overflows */
+        TIMER_REQUIRED_OVFs[ID]++;
+    }
+    else
+    {
+        /* do Nothing */
+    }
+    
+    /* Calculate and update the number of required overflows */
+    TIMER_REQUIRED_OVFs[ID] += (TIMER_COUNTs[ID] / TIMER_MAX_COUNT_VALUE[ID]);
 }
 
 driver_status_t timer_start(timer_id_t);
