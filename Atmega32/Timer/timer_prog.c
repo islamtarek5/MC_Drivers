@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2024-01-09 17:07:55                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2024-01-18 13:39:25                              *
+ * @LastEditDate          : 2024-01-18 13:40:33                              *
  * @FilePath              : timer_prog.c                                     *
  ****************************************************************************/
 
@@ -638,4 +638,37 @@ driver_status_t timer_start(timer_id_t ID)
     return timer_status;
 }
 
-driver_status_t timer_stop(timer_id_t);
+/**
+ * @brief This API is used to stop Timer counting.
+ * @param ID The ID of the used Timer.
+ * @return The status of the API (DRIVER_IS_OK or VALUE_IS_NOT_EXISTED).
+ */
+driver_status_t timer_stop(timer_id_t ID)
+{
+    driver_status_t timer_status = DRIVER_IS_OK;
+
+    /* Check which Timer is used */
+    if (ID == TIMER_0)
+    {
+        /* Set Prescaler for Timer 0 */
+        TCCR0->bits.CS0 = GET_BIT(TIMER_STOP, BIT0);
+        TCCR0->bits.CS1 = GET_BIT(TIMER_STOP, BIT1);
+        TCCR0->bits.CS2 = GET_BIT(TIMER_STOP, BIT2);
+    }
+    else if (ID == TIMER_1)
+    {
+        // TODO: This section will be added with the implementation of Timer 1.
+    }
+    else if (ID == TIMER_2)
+    {
+        // TODO: This section will be added with the implementation of Timer 2.
+    }
+    else
+    {
+        /* The Timer ID isn't existing */
+        timer_status = VALUE_IS_NOT_EXISTED;
+    }
+
+    /* Return the Timer status */
+    return timer_status;
+}

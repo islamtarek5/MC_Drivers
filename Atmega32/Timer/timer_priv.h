@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2024-01-09 17:07:50                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2024-01-18 10:51:14                              *
+ * @LastEditDate          : 2024-01-18 13:32:47                              *
  * @FilePath              : timer_priv.h                                     *
  ****************************************************************************/
 
@@ -54,5 +54,10 @@
 #define TIMER_FLAG_IS_CLEARED           0U
 #define TIMER_FLAG_IS_RAISED            1U 
 #define TIMER_CLEAR_FLAG                1U
+
+/**
+ * @brief Timer Stop Value.
+ */
+#define TIMER_STOP                      0U
 
 #endif
