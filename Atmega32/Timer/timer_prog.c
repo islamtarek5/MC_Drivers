@@ -2,7 +2,7 @@
  * @Author                : Islam Tarek<islam.tarek@valeo.com>               *
  * @CreatedDate           : 2024-01-09 17:07:55                              *
  * @LastEditors           : Islam Tarek<islam.tarek@valeo.com>               *
- * @LastEditDate          : 2024-01-18 13:04:24                              *
+ * @LastEditDate          : 2024-01-18 13:39:25                              *
  * @FilePath              : timer_prog.c                                     *
  ****************************************************************************/
 
@@ -103,7 +103,7 @@ static driver_status_t timer_busy_wait(timer_id_t);
  * @brief This function is used to set Timer Configurations.
  * @param timer_config Is pointer to timer configuration strtucture.
  * @note Configurations of Timer are {Timer_ID, Timer_Mode, Timer_PinFunction, Timer_Technique}.
- * @return The Status of API (DRIVER_IS_OK, VALUE_IS_RESERVED, VALUE_IS_NOT_COMPATIBLE_WITH_OTHER_CONFIGURATIONS, VALUE_IS_NOT_EXISTED, VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER, PTR_USED_IS_NULL_PTR).
+ * @return The status of API (DRIVER_IS_OK, VALUE_IS_RESERVED, VALUE_IS_NOT_COMPATIBLE_WITH_OTHER_CONFIGURATIONS, VALUE_IS_NOT_EXISTED, VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER, PTR_USED_IS_NULL_PTR).
  * @example of Timer Configurations (TIMER_0, TIMER_NORMAL_MODE, TIMER_PIN_NOT_USED, TIMER_BUSY_WAIT_TECH).
  */
 driver_status_t timer_init(timer_cfg_S *timer_config)
@@ -224,7 +224,7 @@ driver_status_t timer_init(timer_cfg_S *timer_config)
  * @brief This API is used to set the Interrupt Status (Enable, Disable).
  * @param ID is the ID of the Timer whose Interrupt status will be set.
  * @param INT_status is the Interrupt Status which will be used (TIMER_DISABLE_ALL_INTERRUPTS, TIMER_ENABLE_OVERFLOW_INERRUPT, TIMER_ENABLE_COMPARE_MATCH_INTERRUPT, TIMER_ENABLE_ALL_INTERRUPTS).
- * @return The Status of API (DRIVER_IS_OK, VALUE_IS_NOT_COMPATIBLE_WITH_OTHER_CONFIGURATIONS, VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER, VALUE_IS_NOT_EXISTED).
+ * @return The status of API (DRIVER_IS_OK, VALUE_IS_NOT_COMPATIBLE_WITH_OTHER_CONFIGURATIONS, VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER, VALUE_IS_NOT_EXISTED).
  */
 driver_status_t timer_set_inerrupt_status(timer_id_t ID, timer_interrupt_status_t INT_status)
 {
@@ -291,7 +291,7 @@ driver_status_t timer_set_inerrupt_status(timer_id_t ID, timer_interrupt_status_
  * @param ID is the ID of Timer whose callback function will be set. 
  * @param cb_type is the Type of callback function (TIMER_OVF_CB, TIMER_CM_CB).
  * @param P2callback is function pointer to callback function.
- * @return The status of the driver (DRIVER_IS_OK, PTR_USED_IS_NULL_PTR or VALUE_IS_NOT_EXISTED)
+ * @return The status of the API (DRIVER_IS_OK, PTR_USED_IS_NULL_PTR or VALUE_IS_NOT_EXISTED)
  */
 driver_status_t timer_set_callback_function(timer_id_t ID, timer_cb_t cb_type, timer_P2VCbFunc_t P2callback)
 {
@@ -366,7 +366,7 @@ static void timer_calculations(timer_id_t ID)
 /**
  * @brief This Static API is used to apply busy wait until the required time is elapsed.
  * @param ID The ID of timer that will be used.
- * @return The status of the Driver (DRIVER_IS_OK or VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER).
+ * @return The status of the API (DRIVER_IS_OK or VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER).
  */
 static driver_status_t timer_busy_wait(timer_id_t ID)
 {
@@ -544,7 +544,7 @@ static driver_status_t timer_busy_wait(timer_id_t ID)
  * @brief This API is used to set the required period in micro-seconds (us).
  * @param ID The ID of used Timer.
  * @param period_us The Period in micro-seconds.
- * @return The status of the driver (DRIVER_IS_OK, VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER or VALUE_IS_NOT_EXISTED).
+ * @return The status of the API (DRIVER_IS_OK, VALUE_IS_NOT_ACCEPTED_FOR_THIS_DRIVER or VALUE_IS_NOT_EXISTED).
  * @note The equation that's used to update time is period = N * (prescaler / CPU clock).
  * Where N is the number of counts, Period is the required period and prescaler & CPU Clock must be configured in Timer_cfg file.
  */
@@ -596,5 +596,46 @@ driver_status_t timer_set_period_us(timer_id_t ID, uint16_t period_us)
     return timer_status;
 }
 
-driver_status_t timer_start(timer_id_t);
+/**
+ * @brief This API is used to start Timer counting.
+ * @param ID The ID of used Timer.
+ * @return The status of the API (DRIVER_IS_OK or VALUE_IS_NOT_EXISTED).
+ * @note This API must be called after setting of Timer configurations and Period or PWM Properities.
+ */
+driver_status_t timer_start(timer_id_t ID)
+{
+    driver_status_t timer_status = DRIVER_IS_OK;
+/* Check if the prescaler value is existing */
+#if((TIMER_PRESCALER_VALUE >= TIMER_WITH_NO_PRESCALING) && (TIMER_PRESCALER_VALUE <= TIMER_WITH_EXT_CLK_RISING_EDGE))
+    /* Check which Timer is used */
+    if(ID == TIMER_0)
+    {
+        /* Set Prescaler for Timer 0 */
+        TCCR0->bits.CS0 = GET_BIT(TIMER_PRESCALER_VALUE, BIT0);
+        TCCR0->bits.CS1 = GET_BIT(TIMER_PRESCALER_VALUE, BIT1);
+        TCCR0->bits.CS2 = GET_BIT(TIMER_PRESCALER_VALUE, BIT2);
+    }
+    else if(ID == TIMER_1)
+    {
+        // TODO: This section will be added with the implementation of Timer 1.
+    }
+    else if(ID == TIMER_2)
+    {
+        // TODO: This section will be added with the implementation of Timer 2.
+    }
+    else
+    {
+        /* The Timer ID isn't existing */
+        timer_status = VALUE_IS_NOT_EXISTED;
+    }
+
+#else
+    /* The Timer Prescaler isn't existing */
+    timer_status = VALUE_IS_NOT_EXISTED;
+#endif
+
+    /* Return the Timer status */
+    return timer_status;
+}
+
 driver_status_t timer_stop(timer_id_t);
